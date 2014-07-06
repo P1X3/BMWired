@@ -14,6 +14,8 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import com.hoho.android.usbserial.driver.Cp21xxSerialDriver;
+import com.hoho.android.usbserial.driver.ProbeTable;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
@@ -43,6 +45,7 @@ public class BMWiService extends Service
   private volatile Thread _workerThread;
   private UsbManager _usbManager;
   private volatile MessageProcessor _messageProcessor;
+  private ProbeTable _usbProbeTable;
 
   // Dummy test variables
   private int messageCount = 0;
@@ -66,8 +69,13 @@ public class BMWiService extends Service
     Log.d(TAG, "onCreate");
     _state = State.STARTING;
     _usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+      if (_usbManager == null)
+          Log.d(TAG, "usbmanger null");
     _messageProcessor = new MessageProcessor();
     _messageProcessor.setEventListener(messageProcessorListener);
+
+    _usbProbeTable = new ProbeTable();
+    _usbProbeTable.addProduct(0x10C4, 0x8584, Cp21xxSerialDriver.class);
 
     super.onCreate();
   }
@@ -101,14 +109,16 @@ public class BMWiService extends Service
     if (_state != State.LISTENING)
     {
       Log.d(TAG, "Starting listening worker");
-      List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(_usbManager);
+
+      UsbSerialProber usbProber = new UsbSerialProber(_usbProbeTable);
+
+      List<UsbSerialDriver> availableDrivers = usbProber.findAllDrivers(_usbManager);
       Log.d(TAG, "AvailableDrivers:" + availableDrivers.size());
 
       if (availableDrivers.size() > 0)
       {
-        for (Iterator<UsbSerialDriver> iterator = availableDrivers.iterator(); iterator.hasNext(); )
+        for (UsbSerialDriver driver : availableDrivers)
         {
-          UsbSerialDriver driver = iterator.next();
           int vendorId = driver.getDevice().getVendorId();
           int productId = driver.getDevice().getProductId();
 
