@@ -1,4 +1,4 @@
-package com.osovskiy.bmwinterface.BMWiService;
+package com.osovskiy.bmwinterface;
 
 /**
  * Created by Vadim on 6/29/2014.

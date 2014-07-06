@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
-import com.osovskiy.bmwinterface.BMWiService.BMWiService;
-
 /**
  * Created by Vadim on 6/29/2014.
  */

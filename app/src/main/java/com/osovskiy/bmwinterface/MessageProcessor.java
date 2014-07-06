@@ -1,4 +1,4 @@
-package com.osovskiy.bmwinterface.BMWiService;
+package com.osovskiy.bmwinterface;
 
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
@@ -28,6 +28,11 @@ public class MessageProcessor
     _bufferHead = 0;
     _synced = false;
     _eventListener = null;
+  }
+
+  public boolean isSynced()
+  {
+    return _synced;
   }
 
   /**
