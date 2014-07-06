@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,47 +9,63 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start"
-        android:id="@+id/buttonStart" />
+        android:id="@+id/buttonStart"
+        android:layout_toRightOf="@+id/buttonUpdate" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Stop"
-        android:id="@+id/buttonStop" />
+        android:id="@+id/buttonStop"
+        android:layout_toRightOf="@+id/buttonStart" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Update"
+        android:id="@+id/buttonUpdate"
+        android:layout_alignParentTop="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
-        android:id="@+id/textServiceStatus"/>
+        android:text="Service status"
+        android:id="@+id/textServiceStatus"
+        android:layout_below="@+id/buttonUpdate" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
-        android:id="@+id/textWorkerStatus"/>
+        android:text="Worker status"
+        android:id="@+id/textWorkerStatus"
+        android:layout_below="@+id/textServiceStatus"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
-        android:id="@+id/textSyncStatus"/>
+        android:text="Sync status"
+        android:id="@+id/textSyncStatus"
+        android:layout_below="@+id/textWorkerStatus"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
-        android:id="@+id/textMessagesCount"/>
+        android:text="Messages count"
+        android:id="@+id/textMessagesCount"
+        android:layout_below="@+id/textSyncStatus"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
-        android:id="@+id/textUpdateTime"/>
-</LinearLayout>
+        android:text="Update time"
+        android:id="@+id/textUpdateTime"
+        android:layout_below="@+id/textMessagesCount"/>
+
+</RelativeLayout>

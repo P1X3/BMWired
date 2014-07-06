@@ -35,6 +35,7 @@ public class BMWiService extends Service
   private final String TAG = this.getClass().getSimpleName();
 
   public static final String ACTION_UPDATE_WIDGET = "BMWiService.ACTION_UPDATE_WIDGET";
+  public static final String ACTION_START_SERVICE = "BMWiService.ACTION_START_SERVICE";
   public static final String ACTION_STOP_SERVICE = "BMWiService.ACTION_STOP_SERVICE";
   public static final String EVENT_USB_DEVICE_ATTACHED = "BMWiService.EVENT_USB_DEVICE_ATTACHED";
 
@@ -42,7 +43,6 @@ public class BMWiService extends Service
   private volatile Thread _workerThread;
   private UsbManager _usbManager;
   private volatile MessageProcessor _messageProcessor;
-  private Timer _timer;
 
   // Dummy test variables
   private int messageCount = 0;
@@ -69,16 +69,6 @@ public class BMWiService extends Service
     _messageProcessor = new MessageProcessor();
     _messageProcessor.setEventListener(messageProcessorListener);
 
-    _timer = new Timer();
-    _timer.scheduleAtFixedRate(new TimerTask()
-    {
-      @Override
-      public void run()
-      {
-        updateWidget();
-      }
-    }, 0, 1000*5);
-
     super.onCreate();
   }
 
@@ -88,7 +78,6 @@ public class BMWiService extends Service
     Log.d(TAG, "onDestroy");
     if (_workerThread != null)
       _workerThread.interrupt();
-    _timer.cancel();
 
     super.onDestroy();
   }
@@ -111,7 +100,9 @@ public class BMWiService extends Service
 
     if (_state != State.LISTENING)
     {
+      Log.d(TAG, "Starting listening worker");
       List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(_usbManager);
+      Log.d(TAG, "AvailableDrivers:" + availableDrivers.size());
 
       if (availableDrivers.size() > 0)
       {
@@ -120,6 +111,8 @@ public class BMWiService extends Service
           UsbSerialDriver driver = iterator.next();
           int vendorId = driver.getDevice().getVendorId();
           int productId = driver.getDevice().getProductId();
+
+          Log.d(TAG, "USB Serial Driver: " + vendorId + "/" + productId);
 
           if (vendorId == 4292 && productId == 34180) // 0x10C4 0x8584
           //if (vendorId == 4292 && productId == 60000)
@@ -151,6 +144,9 @@ public class BMWiService extends Service
 
     Log.d(TAG, "updateWidget:"+sdf.format(calendar.getTime()));
 
+    Intent updateWidgetIntent = new Intent(getApplicationContext(),WidgetProvider.class);
+    updateWidgetIntent.setAction(WidgetProvider.UPDATE_CLICKED);
+    remoteViews.setOnClickPendingIntent(R.id.buttonUpdate, PendingIntent.getBroadcast(getApplicationContext(), 0, updateWidgetIntent, 0));
 
     Intent startServiceIntent = new Intent(getApplicationContext(),WidgetProvider.class);
     startServiceIntent.setAction(WidgetProvider.START_CLICKED);

@@ -3,6 +3,7 @@
     package="com.osovskiy.bmwinterface" >
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.USB_PERMISSION" />
 
     <uses-feature android:name="android.hardware.usb.host" />
 

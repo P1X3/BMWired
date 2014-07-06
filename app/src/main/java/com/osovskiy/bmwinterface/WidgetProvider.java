@@ -16,10 +16,12 @@ public class WidgetProvider extends AppWidgetProvider
 {
   public static final String START_CLICKED = "startClicked";
   public static final String STOP_CLICKED = "stopClicked";
+  public static final String UPDATE_CLICKED = "updateClicked";
   @Override
   public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)
   {
-    RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
+    Log.d("WidgetProvider", "onUpdate");
+    /*RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
     ComponentName widget = new ComponentName(context, WidgetProvider.class);
 
     Intent startServiceIntent = new Intent(context,getClass());
@@ -30,7 +32,7 @@ public class WidgetProvider extends AppWidgetProvider
     stopServiceIntent.setAction(STOP_CLICKED);
     remoteViews.setOnClickPendingIntent(R.id.buttonStop, PendingIntent.getBroadcast(context, 0, stopServiceIntent, 0));
 
-    appWidgetManager.updateAppWidget(widget, remoteViews);
+    appWidgetManager.updateAppWidget(widget, remoteViews);*/
 
     Intent updateIntent = new Intent(context, BMWiService.class);
     updateIntent.setAction(BMWiService.ACTION_UPDATE_WIDGET);
@@ -47,12 +49,19 @@ public class WidgetProvider extends AppWidgetProvider
     if (START_CLICKED.equals(intent.getAction()))
     {
       Intent serviceIntent = new Intent(context, BMWiService.class);
+      serviceIntent.setAction(BMWiService.ACTION_START_SERVICE);
       context.startService(serviceIntent);
     }
     else if (STOP_CLICKED.equals(intent.getAction()))
     {
       Intent serviceIntent = new Intent(context, BMWiService.class);
       serviceIntent.setAction(BMWiService.ACTION_STOP_SERVICE);
+      context.startService(serviceIntent);
+    }
+    else if (UPDATE_CLICKED.equals(intent.getAction()))
+    {
+      Intent serviceIntent = new Intent(context, BMWiService.class);
+      serviceIntent.setAction(BMWiService.ACTION_UPDATE_WIDGET);
       context.startService(serviceIntent);
     }
   }
