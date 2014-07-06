@@ -93,9 +93,10 @@ public class BMWiService extends Service
   @Override
   public int onStartCommand(Intent intent, int flags, int startId)
   {
-    Log.d(TAG, "onStartCommand: " + intent.getAction());
+    Log.d(TAG, "onStartCommand");
     if (intent.getAction() != null)
     {
+      Log.d(TAG, "Action: " + intent.getAction());
       if (intent.getAction().equals(ACTION_UPDATE_WIDGET))
       {
         updateWidget();
@@ -128,6 +129,7 @@ public class BMWiService extends Service
           //if (vendorId == 4292 && productId == 60000)
           {
             _workerThread = new ListeningThread(driver);
+            _workerThread.start();
             _state = State.LISTENING;
             break;
           }
@@ -177,6 +179,7 @@ public class BMWiService extends Service
     public void newMessage(BusMessage message)
     {
       messageCount++;
+      Log.d(TAG, message.toString());
       if (message.getType() != null)
       {
         Toast.makeText(getApplicationContext(), "Received " + (BusMessage.Type.valueOf(message.getType().name())) + " message", Toast.LENGTH_SHORT).show();
@@ -219,7 +222,6 @@ public class BMWiService extends Service
           int bytesRead = serialPort.read(buffer, 100);
           _messageProcessor.appendBuffer(Arrays.copyOf(buffer, bytesRead));
           _messageProcessor.process();
-          Log.d(TAG, "Read " + bytesRead + " byte(s)");
         }
 
         serialPort.close();
