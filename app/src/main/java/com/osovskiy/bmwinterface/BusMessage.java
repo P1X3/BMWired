@@ -2,6 +2,7 @@ package com.osovskiy.bmwinterface;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Formatter;
 
 /**
  * Created by Vadim on 6/30/2014.
@@ -44,8 +45,12 @@ public class BusMessage
   @Override
   public String toString()
   {
+    Formatter formatter = new Formatter();
+    for (byte b: raw)
+      formatter.format("%02x");
+
     return "BusMessage{" +
-            "raw=" + Arrays.toString(raw) +
+            "raw=" + formatter.toString() +
             ", type=" + type +
             '}';
   }
@@ -63,7 +68,9 @@ public class BusMessage
     MFSW_RT(new byte[] {0x50, 0x03, (byte)0xC8, 0x01, (byte)0x9A}),
     MFSW_DIAL_PRESSED(new byte[] {0x50, 0x04, (byte)0xC8, 0x3B, (byte)0x80, 0x27}),
     MFSW_DIAL_1SEC(new byte[] {0x50, 0x04, (byte)0xC8, 0x3B, (byte)0x90, 0x37}),
-    MFSW_DIAL_RELEASED(new byte[] {0x50, 0x04, (byte)0xC8, 0x3B, (byte)0xA0, 0x07});
+    MFSW_DIAL_RELEASED(new byte[] {0x50, 0x04, (byte)0xC8, 0x3B, (byte)0xA0, 0x07}),
+    GENERAL_LOCK_ALL(new byte[] {0x3F, 0x05, 0x00, 0x0C, (byte)0x97, 0x01, (byte)0xA0}),
+    GENERAL_UNLOCK_ALL(new byte[] {0x00, 0x05, 0x00, 0x0C, (byte)0x96, 0x01, (byte)0x9E});
 
 
     byte[] raw;
