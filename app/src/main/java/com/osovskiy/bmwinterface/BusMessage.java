@@ -1,5 +1,7 @@
 package com.osovskiy.bmwinterface;
 
+import java.util.Arrays;
+
 /**
  * Created by Vadim on 6/30/2014.
  */
@@ -32,12 +34,20 @@ public class BusMessage
       testChecksum ^= msg[i];
     }
 
-    if (testChecksum != msg[msg.length])
+    if (testChecksum != msg[msg.length-1])
       return null;
 
     return new BusMessage(msg);
   }
 
+  @Override
+  public String toString()
+  {
+    return "BusMessage{" +
+            "raw=" + Arrays.toString(raw) +
+            ", type=" + type +
+            '}';
+  }
 
   public enum Type // TODO: Storing raw messages is redundant
   {
