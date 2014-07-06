@@ -1,5 +1,6 @@
 package com.osovskiy.bmwinterface;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 /**
@@ -76,7 +77,7 @@ public class BusMessage
     {
       for(Type t: Type.values())
       {
-        if (t.raw.equals(data))
+        if (Arrays.equals(t.raw, data))
           return t;
       }
       return null;
