@@ -193,8 +193,6 @@ public class BMWiService extends Service
       Log.d(TAG, message.toString());
       if (message.getType() != null)
       {
-        Toast.makeText(getApplicationContext(), "Received " + (BusMessage.Type.valueOf(message.getType().name())) + " message", Toast.LENGTH_SHORT).show();
-
         if (message.getType() == BusMessage.Type.MFSW_VOLUME_UP)
         {
           _audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
