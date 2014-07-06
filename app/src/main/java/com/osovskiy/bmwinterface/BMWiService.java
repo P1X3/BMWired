@@ -9,7 +9,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
+import android.media.AudioManager;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -46,6 +49,8 @@ public class BMWiService extends Service
   private UsbManager _usbManager;
   private volatile MessageProcessor _messageProcessor;
   private ProbeTable _usbProbeTable;
+  private AudioManager _audioManager;
+  private Handler _messageProcessorHandler;
 
   // Dummy test variables
   private int messageCount = 0;
@@ -68,11 +73,17 @@ public class BMWiService extends Service
   {
     Log.d(TAG, "onCreate");
     _state = State.STARTING;
+
+    _messageProcessorHandler = new Handler();
+
     _usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
       if (_usbManager == null)
           Log.d(TAG, "usbmanger null");
     _messageProcessor = new MessageProcessor();
     _messageProcessor.setEventListener(messageProcessorListener);
+    _messageProcessor.setServiceHandler(_messageProcessorHandler);
+
+    _audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 
     _usbProbeTable = new ProbeTable();
     _usbProbeTable.addProduct(0x10C4, 0x8584, Cp21xxSerialDriver.class);
@@ -183,6 +194,15 @@ public class BMWiService extends Service
       if (message.getType() != null)
       {
         Toast.makeText(getApplicationContext(), "Received " + (BusMessage.Type.valueOf(message.getType().name())) + " message", Toast.LENGTH_SHORT).show();
+
+        if (message.getType() == BusMessage.Type.MFSW_VOLUME_UP)
+        {
+          _audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+        }
+        else if (message.getType() == BusMessage.Type.MFSW_VOLUME_DOWN)
+        {
+          _audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+        }
       }
     }
   };

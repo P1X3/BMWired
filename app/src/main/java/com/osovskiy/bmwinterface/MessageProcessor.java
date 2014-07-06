@@ -1,5 +1,8 @@
 package com.osovskiy.bmwinterface;
 
+import android.media.AudioManager;
+import android.os.Handler;
+
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 
@@ -15,10 +18,32 @@ public class MessageProcessor
   private int _bufferTail, _bufferHead;
   private boolean _synced;
   private EventListener _eventListener; // TODO: Add possibility to accept multiple listeners
+  private Handler _serviceHandler;
 
   public void setEventListener(EventListener _eventListener)
   {
     this._eventListener = _eventListener;
+  }
+
+  public void setServiceHandler(Handler handler)
+  {
+    _serviceHandler = handler;
+  }
+
+  private void fireHandler(final BusMessage message)
+  {
+    if (_serviceHandler == null)
+      return;
+
+    _serviceHandler.post(new Runnable()
+    {
+      @Override
+      public void run() // runs on service thread
+      {
+        if (_eventListener != null)
+          _eventListener.newMessage(message);
+      }
+    });
   }
 
   public MessageProcessor()
@@ -28,6 +53,7 @@ public class MessageProcessor
     _bufferHead = 0;
     _synced = false;
     _eventListener = null;
+    _serviceHandler = null;
   }
 
   public boolean isSynced()
@@ -84,7 +110,7 @@ public class MessageProcessor
     {
       if (size() >= MSG_MIN_SIZE) // At least five bytes in buffer (minimum message length)
       {
-        int assumedLength = peek(1) + 2;
+        int assumedLength = (peek(1)&0xFF) + 2;
         if (size() >= assumedLength) // TODO: Find an alternative since this method may cause unnecessary delays.
         {
           ByteBuffer byteBuffer = ByteBuffer.allocate(assumedLength);
@@ -101,8 +127,7 @@ public class MessageProcessor
             _synced = true;
             truncate(assumedLength);
 
-            if (_eventListener != null)
-              _eventListener.newMessage(busMessage);
+            fireHandler(busMessage);
           }
           else
           {
