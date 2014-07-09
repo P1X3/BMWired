@@ -211,6 +211,7 @@ public class BMWiService extends Service
           _audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
         }
       }
+      updateWidget();
     }
   };
 
