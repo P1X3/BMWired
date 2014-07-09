@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -209,6 +210,34 @@ public class BMWiService extends Service
         else if (message.getType() == BusMessage.Type.MFSW_VOLUME_DOWN)
         {
           _audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+        }
+        else if (message.getType() == BusMessage.Type.MFSW_NEXT_PRESSED)
+        {
+          Intent mediaIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+          synchronized (this)
+          {
+            mediaIntent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_NEXT));
+            sendOrderedBroadcast(mediaIntent, null);
+
+            mediaIntent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_NEXT));
+            sendOrderedBroadcast(mediaIntent, null);
+          }
+        }
+        else if (message.getType() == BusMessage.Type.MFSW_PREVIOUS_PRESSED)
+        {
+          Intent mediaIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+          synchronized (this)
+          {
+            mediaIntent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PREVIOUS));
+            sendOrderedBroadcast(mediaIntent, null);
+
+            mediaIntent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PREVIOUS));
+            sendOrderedBroadcast(mediaIntent, null);
+          }
+        }
+        else if (message.getType() == BusMessage.Type.MFSW_DIAL_PRESSED)
+        {
+          // TODO: Call Google Now voice intent
         }
       }
       updateWidget();
