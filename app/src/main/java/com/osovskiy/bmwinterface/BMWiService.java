@@ -3,7 +3,6 @@ package com.osovskiy.bmwinterface;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -12,11 +11,9 @@ import android.hardware.usb.UsbManager;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import com.hoho.android.usbserial.driver.Cp21xxSerialDriver;
 import com.hoho.android.usbserial.driver.ProbeTable;
@@ -28,10 +25,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by Vadim on 6/29/2014.

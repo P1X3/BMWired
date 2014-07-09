@@ -1,6 +1,5 @@
 package com.osovskiy.bmwinterface;
 
-import android.media.AudioManager;
 import android.os.Handler;
 
 import java.nio.BufferOverflowException;
