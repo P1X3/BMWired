@@ -39,6 +39,8 @@ public class BMWiService extends Service
 {
   private final String TAG = this.getClass().getSimpleName();
 
+  private final int WIDGET_UPDATE_DELAY = 1*1000;
+
   public static final String ACTION_UPDATE_WIDGET = "BMWiService.ACTION_UPDATE_WIDGET";
   public static final String ACTION_START_SERVICE = "BMWiService.ACTION_START_SERVICE";
   public static final String ACTION_STOP_SERVICE = "BMWiService.ACTION_STOP_SERVICE";
@@ -51,6 +53,7 @@ public class BMWiService extends Service
   private ProbeTable _usbProbeTable;
   private AudioManager _audioManager;
   private Handler _messageProcessorHandler;
+  private long _lastWidgetUpdateTime;
 
   // Dummy test variables
   private int messageCount = 0;
@@ -73,6 +76,7 @@ public class BMWiService extends Service
   {
     Log.d(TAG, "onCreate");
     _state = State.STARTING;
+    _lastWidgetUpdateTime = 0;
 
     _messageProcessorHandler = new Handler();
 
@@ -154,6 +158,11 @@ public class BMWiService extends Service
   private void updateWidget()
   {
     Log.d(TAG, "updateWidget");
+
+    if ((System.currentTimeMillis() - _lastWidgetUpdateTime) < WIDGET_UPDATE_DELAY)
+      return;
+
+    _lastWidgetUpdateTime = System.currentTimeMillis();
 
     SimpleDateFormat sdf = new SimpleDateFormat("dd:MMMM:yyyy HH:mm:ss a");
     Calendar calendar = Calendar.getInstance();
