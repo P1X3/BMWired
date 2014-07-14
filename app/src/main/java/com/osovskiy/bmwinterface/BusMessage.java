@@ -44,12 +44,8 @@ public class BusMessage
   @Override
   public String toString()
   {
-    Formatter formatter = new Formatter();
-    for (byte b: raw)
-      formatter.format("%02x");
-
     return "BusMessage{" +
-            "raw=" + formatter.toString() +
+            "raw=" + Arrays.toString(raw) +
             ", type=" + type +
             '}';
   }
