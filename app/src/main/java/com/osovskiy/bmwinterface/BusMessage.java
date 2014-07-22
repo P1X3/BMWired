@@ -1,5 +1,7 @@
 package com.osovskiy.bmwinterface;
 
+import com.hoho.android.usbserial.util.HexDump;
+
 import java.util.Arrays;
 import java.util.Formatter;
 
@@ -45,7 +47,7 @@ public class BusMessage
   public String toString()
   {
     return "BusMessage{" +
-            "raw=" + Arrays.toString(raw) +
+            "raw=" + HexDump.toHexString(raw) +
             ", type=" + type +
             '}';
   }
