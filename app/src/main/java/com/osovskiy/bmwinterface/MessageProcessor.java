@@ -4,6 +4,8 @@ import android.os.Handler;
 
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Vadim on 6/29/2014.
@@ -16,12 +18,17 @@ public class MessageProcessor
   private byte[] _buffer;
   private int _bufferTail, _bufferHead;
   private boolean _synced;
-  private EventListener _eventListener; // TODO: Add possibility to accept multiple listeners
+  private List<EventListener> _eventListeners;
   private Handler _serviceHandler;
 
-  public void setEventListener(EventListener _eventListener)
+  public void addEventListener(EventListener eventListener)
   {
-    this._eventListener = _eventListener;
+    _eventListeners.add(eventListener);
+  }
+
+  public boolean removeEventListener(EventListener eventListener)
+  {
+    return _eventListeners.remove(eventListener);
   }
 
   public void setServiceHandler(Handler handler)
@@ -39,8 +46,10 @@ public class MessageProcessor
       @Override
       public void run() // runs on service thread
       {
-        if (_eventListener != null)
-          _eventListener.newMessage(message);
+          for (EventListener el : _eventListeners)
+          {
+              el.newMessage(message);
+          }
       }
     });
   }
@@ -51,7 +60,7 @@ public class MessageProcessor
     _bufferTail = 0;
     _bufferHead = 0;
     _synced = false;
-    _eventListener = null;
+    _eventListeners = new ArrayList<EventListener>();
     _serviceHandler = null;
   }
 
@@ -110,7 +119,7 @@ public class MessageProcessor
       if (size() >= MSG_MIN_SIZE) // At least five bytes in buffer (minimum message length)
       {
         int assumedLength = (peek(1)&0xFF) + 2;
-        if (size() >= assumedLength) // TODO: Find an alternative since this method may cause unnecessary delays.
+        if (size() >= assumedLength)
         {
           ByteBuffer byteBuffer = ByteBuffer.allocate(assumedLength);
 
