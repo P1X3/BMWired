@@ -79,7 +79,7 @@ public class BMWiService extends Service
       if (_usbManager == null)
           Log.d(TAG, "usbmanger null");
     _messageProcessor = new MessageProcessor();
-    _messageProcessor.setEventListener(messageProcessorListener);
+    _messageProcessor.addEventListener(messageProcessorListener);
     _messageProcessor.setServiceHandler(_messageProcessorHandler);
 
     _audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
@@ -252,11 +252,10 @@ public class BMWiService extends Service
     public void run()
     {
       Log.d(TAG, "ListeningThread run");
-      UsbDeviceConnection connection = null;
       UsbSerialPort serialPort = null;
       try
       {
-        connection = _usbManager.openDevice(_driver.getDevice());
+        UsbDeviceConnection connection = _usbManager.openDevice(_driver.getDevice());
         serialPort = _driver.getPorts().get(0);
 
         if (connection == null)

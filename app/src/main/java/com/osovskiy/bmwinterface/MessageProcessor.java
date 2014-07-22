@@ -72,7 +72,7 @@ public class MessageProcessor
   /**
    * Add data to the buffer. Called by thread that reads data from serial port.
    *
-   * @param data
+   * @param data The bytes to append to buffer
    */
   protected void appendBuffer(byte data[])
   {
@@ -89,7 +89,7 @@ public class MessageProcessor
   /**
    * Peek at the first available byte in a buffer
    *
-   * @return
+   * @return The first data byte
    */
   protected byte peek()
   {
@@ -99,8 +99,8 @@ public class MessageProcessor
   /**
    * Peek at specific byte in a buffer
    *
-   * @param offset
-   * @return
+   * @param offset The number of bytes to offset by
+   * @return The data byte at offset position
    */
   protected byte peek(int offset)
   {
@@ -154,11 +154,11 @@ public class MessageProcessor
   /**
    * Get number of bytes in buffer
    *
-   * @return
+   * @return The number of data bytes in buffer
    */
   protected int size()
   {
-    return (int) (BUFFER_SIZE + _bufferHead - _bufferTail) % BUFFER_SIZE;
+    return (BUFFER_SIZE + _bufferHead - _bufferTail) % BUFFER_SIZE;
   }
 
   /**
@@ -171,7 +171,7 @@ public class MessageProcessor
 
   /**
    * Truncate certain amount of bytes. Used when buffer is in sync and valid message was read
-   * @param amount
+   * @param amount The number of bytes
    */
   protected void truncate(int amount)
   {
