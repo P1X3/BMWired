@@ -87,4 +87,65 @@ public class BusMessage
       return null;
     }
   }
+  public enum Device
+  {
+    Broadcast(0x00),
+    SHD(0x06),
+    CD(0x18),
+    HKM(0x24),
+    FUM(0x28),
+    CCM(0x30),
+    NAV(0x3B),
+    DIA(0x3F),
+    FBZV(0x40),
+    GTF(0x43),
+    EWS(0x44),
+    CID(0x46),
+    FMBT(0x47),
+    MFL(0x50),
+    MML(0x51),
+    IHK(0x5B),
+    PDC(0x60),
+    CDCD(0x66),
+    RAD(0x68),
+    DSP(0x6A),
+    RDC(0x70),
+    SM(0x72),
+    SDRS(0x73),
+    CDCD2(0x76),
+    NAVE(0x7F),
+    IKE(0x80),
+    MMR(0x9B),
+    CVM(0x9C),
+    FMID(0xA0),
+    ACM(0xA4),
+    FHK(0xA7),
+    HAVC(0xA8),
+    EHC(0xAC),
+    SES(0xB0),
+    TV(0xBB),
+    LCM(0xBF),
+    MID(0xC0),
+    PHONE(0xC8),
+    LKM(0xD0),
+    SMAD(0xDA),
+    IRIS(0xE0),
+    OBS(0xE7),
+    ISP(0xE8),
+    LWSMTV(0xED),
+    CSU(0xF5),
+    Broadcast2(0xFF);
+
+    private final byte id;
+
+    Device(int id)
+    {
+      this.id = (byte) id;
+    }
+
+    public byte getId()
+    {
+      return this.id;
+    }
+  }
 }
