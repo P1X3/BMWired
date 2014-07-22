@@ -29,6 +29,12 @@ public class BusMessage
     type = Type.tryParse(raw); // TODO: Replace blocking code
   }
 
+  public BusMessage(Type type)
+  {
+    raw = type.raw;
+    this.type = type;
+  }
+
   public static BusMessage tryParse(byte[] msg)
   {
     byte testChecksum = 0;
