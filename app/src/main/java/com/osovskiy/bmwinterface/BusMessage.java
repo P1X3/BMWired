@@ -3,7 +3,6 @@ package com.osovskiy.bmwinterface;
 import com.hoho.android.usbserial.util.HexDump;
 
 import java.util.Arrays;
-import java.util.Formatter;
 
 /**
  * Created by Vadim on 6/30/2014.
@@ -38,12 +37,12 @@ public class BusMessage
   public static BusMessage tryParse(byte[] msg)
   {
     byte testChecksum = 0;
-    for (int i = 0; i < msg.length-1; i++)
+    for ( int i = 0; i < msg.length - 1; i++ )
     {
       testChecksum ^= msg[i];
     }
 
-    if (testChecksum != msg[msg.length-1])
+    if ( testChecksum != msg[msg.length - 1] )
       return null;
 
     return new BusMessage(msg);
@@ -53,27 +52,27 @@ public class BusMessage
   public String toString()
   {
     return "BusMessage{" +
-            "raw=" + HexDump.toHexString(raw) +
-            ", type=" + type +
-            '}';
+        "raw=" + HexDump.toHexString(raw) +
+        ", type=" + type +
+        '}';
   }
 
   public enum Type // TODO: Storing raw messages is redundant
   {
-    MFSW_VOLUME_UP(new byte[] {0x50, 0x04, 0x68, 0x32, 0x11, 0x1F}),
-    MFSW_VOLUME_DOWN(new byte[] {0x50, 0x04, 0x68, 0x32, 0x10, 0x1E}),
-    MFSW_NEXT_PRESSED(new byte[] {0x50, 0x04, 0x68, 0x3B, 0x01, 0x06}),
-    MFSW_NEXT_1SEC(new byte[] {0x50, 0x04, 0x68, 0x3B, 0x11, 0x16}),
-    MFSW_NEXT_RELEASED(new byte[] {0x50, 0x04, 0x68, 0x3B, 0x21, 0x26}),
-    MFSW_PREVIOUS_PRESSED(new byte[] {0x50, 0x04, 0x68, 0x3B, 0x08, 0x0F}),
-    MFSW_PREVIOUS_1SEC(new byte[] {0x50, 0x04, 0x68, 0x3B, 0x18, 0x1F}),
-    MFSW_PREVIOUS_RELEASED(new byte[] {0x50, 0x04, 0x68, 0x3B, 0x28, 0x2F}),
-    MFSW_RT(new byte[] {0x50, 0x03, (byte)0xC8, 0x01, (byte)0x9A}),
-    MFSW_DIAL_PRESSED(new byte[] {0x50, 0x04, (byte)0xC8, 0x3B, (byte)0x80, 0x27}),
-    MFSW_DIAL_1SEC(new byte[] {0x50, 0x04, (byte)0xC8, 0x3B, (byte)0x90, 0x37}),
-    MFSW_DIAL_RELEASED(new byte[] {0x50, 0x04, (byte)0xC8, 0x3B, (byte)0xA0, 0x07}),
-    GENERAL_LOCK_ALL(new byte[] {0x3F, 0x05, 0x00, 0x0C, (byte)0x97, 0x01, (byte)0xA0}),
-    GENERAL_UNLOCK_ALL(new byte[] {0x00, 0x05, 0x00, 0x0C, (byte)0x96, 0x01, (byte)0x9E});
+    MFSW_VOLUME_UP(new byte[]{ 0x50, 0x04, 0x68, 0x32, 0x11, 0x1F }),
+    MFSW_VOLUME_DOWN(new byte[]{ 0x50, 0x04, 0x68, 0x32, 0x10, 0x1E }),
+    MFSW_NEXT_PRESSED(new byte[]{ 0x50, 0x04, 0x68, 0x3B, 0x01, 0x06 }),
+    MFSW_NEXT_1SEC(new byte[]{ 0x50, 0x04, 0x68, 0x3B, 0x11, 0x16 }),
+    MFSW_NEXT_RELEASED(new byte[]{ 0x50, 0x04, 0x68, 0x3B, 0x21, 0x26 }),
+    MFSW_PREVIOUS_PRESSED(new byte[]{ 0x50, 0x04, 0x68, 0x3B, 0x08, 0x0F }),
+    MFSW_PREVIOUS_1SEC(new byte[]{ 0x50, 0x04, 0x68, 0x3B, 0x18, 0x1F }),
+    MFSW_PREVIOUS_RELEASED(new byte[]{ 0x50, 0x04, 0x68, 0x3B, 0x28, 0x2F }),
+    MFSW_RT(new byte[]{ 0x50, 0x03, (byte) 0xC8, 0x01, (byte) 0x9A }),
+    MFSW_DIAL_PRESSED(new byte[]{ 0x50, 0x04, (byte) 0xC8, 0x3B, (byte) 0x80, 0x27 }),
+    MFSW_DIAL_1SEC(new byte[]{ 0x50, 0x04, (byte) 0xC8, 0x3B, (byte) 0x90, 0x37 }),
+    MFSW_DIAL_RELEASED(new byte[]{ 0x50, 0x04, (byte) 0xC8, 0x3B, (byte) 0xA0, 0x07 }),
+    GENERAL_LOCK_ALL(new byte[]{ 0x3F, 0x05, 0x00, 0x0C, (byte) 0x97, 0x01, (byte) 0xA0 }),
+    GENERAL_UNLOCK_ALL(new byte[]{ 0x00, 0x05, 0x00, 0x0C, (byte) 0x96, 0x01, (byte) 0x9E });
 
 
     byte[] raw;
@@ -85,14 +84,15 @@ public class BusMessage
 
     public static Type tryParse(byte data[])
     {
-      for(Type t: Type.values())
+      for ( Type t : Type.values() )
       {
-        if (Arrays.equals(t.raw, data))
+        if ( Arrays.equals(t.raw, data) )
           return t;
       }
       return null;
     }
   }
+
   public enum Device
   {
     Broadcast(0x00),

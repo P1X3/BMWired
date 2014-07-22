@@ -34,7 +34,7 @@ public class BMWiService extends Service
 {
   private final String TAG = this.getClass().getSimpleName();
 
-  private final int WIDGET_UPDATE_DELAY = 1*1000;
+  private final int WIDGET_UPDATE_DELAY = 1 * 1000;
 
   public static final String ACTION_UPDATE_WIDGET_STATUS = "BMWiService.ACTION_UPDATE_WIDGET_STATUS";
   public static final String ACTION_START_SERVICE = "BMWiService.ACTION_START_SERVICE";
@@ -52,7 +52,6 @@ public class BMWiService extends Service
 
   // Dummy test variables
   private int messageCount = 0;
-
 
   public BMWiService()
   {
@@ -76,18 +75,19 @@ public class BMWiService extends Service
     _messageProcessorHandler = new Handler();
 
     _usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-      if (_usbManager == null)
-          Log.d(TAG, "usbmanger null");
+    if ( _usbManager == null )
+      Log.d(TAG, "usbmanger null");
     _messageProcessor = new MessageProcessor();
     _messageProcessor.addEventListener(messageProcessorListener);
     _messageProcessor.setServiceHandler(_messageProcessorHandler);
 
-    _audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+    _audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
     _usbProbeTable = new ProbeTable();
     _usbProbeTable.addProduct(0x10C4, 0x8584, Cp21xxSerialDriver.class);
 
     _state = State.IDLING;
+
     super.onCreate();
   }
 
@@ -95,7 +95,7 @@ public class BMWiService extends Service
   public void onDestroy()
   {
     Log.d(TAG, "onDestroy");
-    if (_workerThread != null)
+    if ( _workerThread != null )
       _workerThread.interrupt();
 
     super.onDestroy();
@@ -105,36 +105,34 @@ public class BMWiService extends Service
   public int onStartCommand(Intent intent, int flags, int startId)
   {
     Log.d(TAG, "onStartCommand");
-    if (intent.getAction() != null)
+    if ( intent.getAction() != null )
     {
       Log.d(TAG, "Action: " + intent.getAction());
-      if (intent.getAction().equals(ACTION_UPDATE_WIDGET_STATUS))
+      if ( intent.getAction().equals(ACTION_UPDATE_WIDGET_STATUS) )
       {
         updateWidgetStatus(intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID));
       }
-      else if (intent.getAction().equals(ACTION_STOP_SERVICE))
+      else if ( intent.getAction().equals(ACTION_STOP_SERVICE) )
       {
         stopSelf();
       }
     }
 
-    if (_state != State.LISTENING)
+    if ( _state != State.LISTENING )
     {
-      Log.d(TAG, "Starting listening worker");
-
       UsbSerialProber usbProber = new UsbSerialProber(_usbProbeTable);
 
       List<UsbSerialDriver> availableDrivers = usbProber.findAllDrivers(_usbManager);
       Log.d(TAG, "AvailableDrivers:" + availableDrivers.size());
 
-      if (availableDrivers.size() > 0)
+      if ( availableDrivers.size() > 0 )
       {
         UsbSerialDriver driver = availableDrivers.get(0);
         int vendorId = driver.getDevice().getVendorId();
         int productId = driver.getDevice().getProductId();
 
         Log.d(TAG, "Using USB Serial Driver: " + vendorId + "/" + productId);
-
+        Log.d(TAG, "Starting listening worker");
         _workerThread = new ListeningThread(driver);
         _workerThread.start();
         _state = State.LISTENING;
@@ -148,7 +146,7 @@ public class BMWiService extends Service
   {
     Log.d(TAG, "updateWidgetStatus");
 
-    if ((System.currentTimeMillis() - _lastWidgetUpdateTime) < WIDGET_UPDATE_DELAY)
+    if ( ( System.currentTimeMillis() - _lastWidgetUpdateTime ) < WIDGET_UPDATE_DELAY )
       return;
 
     _lastWidgetUpdateTime = System.currentTimeMillis();
@@ -160,20 +158,20 @@ public class BMWiService extends Service
     remoteViews.setTextViewText(R.id.textSyncStatus, "Sync: " + String.valueOf(_messageProcessor.isSynced()));
     remoteViews.setTextViewText(R.id.textMessagesCount, "Msg: " + String.valueOf(messageCount));
     remoteViews.setTextViewText(R.id.textServiceStatus, "State: " + String.valueOf(_state));
-    remoteViews.setTextViewText(R.id.textWorkerStatus, "Worker: " + String.valueOf((_workerThread != null)));
+    remoteViews.setTextViewText(R.id.textWorkerStatus, "Worker: " + String.valueOf(( _workerThread != null )));
     remoteViews.setTextViewText(R.id.textUpdateTime, "Updated: " + String.valueOf(sdf.format(calendar.getTime())));
 
-    Log.d(TAG, "updateWidgetStatus:"+sdf.format(calendar.getTime()));
+    Log.d(TAG, "updateWidgetStatus:" + sdf.format(calendar.getTime()));
 
-    Intent updateWidgetIntent = new Intent(getApplicationContext(),StatusWidgetProvider.class);
+    Intent updateWidgetIntent = new Intent(getApplicationContext(), StatusWidgetProvider.class);
     updateWidgetIntent.setAction(StatusWidgetProvider.UPDATE_CLICKED);
     remoteViews.setOnClickPendingIntent(R.id.buttonUpdate, PendingIntent.getBroadcast(getApplicationContext(), 0, updateWidgetIntent, 0));
 
-    Intent startServiceIntent = new Intent(getApplicationContext(),StatusWidgetProvider.class);
+    Intent startServiceIntent = new Intent(getApplicationContext(), StatusWidgetProvider.class);
     startServiceIntent.setAction(StatusWidgetProvider.START_CLICKED);
     remoteViews.setOnClickPendingIntent(R.id.buttonStart, PendingIntent.getBroadcast(getApplicationContext(), 0, startServiceIntent, 0));
 
-    Intent stopServiceIntent = new Intent(getApplicationContext(),StatusWidgetProvider.class);
+    Intent stopServiceIntent = new Intent(getApplicationContext(), StatusWidgetProvider.class);
     stopServiceIntent.setAction(StatusWidgetProvider.STOP_CLICKED);
     remoteViews.setOnClickPendingIntent(R.id.buttonStop, PendingIntent.getBroadcast(getApplicationContext(), 0, stopServiceIntent, 0));
 
@@ -189,20 +187,20 @@ public class BMWiService extends Service
     {
       messageCount++;
       Log.d(TAG, message.toString());
-      if (message.getType() != null)
+      if ( message.getType() != null )
       {
-        if (message.getType() == BusMessage.Type.MFSW_VOLUME_UP)
+        if ( message.getType() == BusMessage.Type.MFSW_VOLUME_UP )
         {
           _audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
         }
-        else if (message.getType() == BusMessage.Type.MFSW_VOLUME_DOWN)
+        else if ( message.getType() == BusMessage.Type.MFSW_VOLUME_DOWN )
         {
           _audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
         }
-        else if (message.getType() == BusMessage.Type.MFSW_NEXT_PRESSED)
+        else if ( message.getType() == BusMessage.Type.MFSW_NEXT_PRESSED )
         {
           Intent mediaIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
-          synchronized (this)
+          synchronized ( this )
           {
             mediaIntent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_NEXT));
             sendOrderedBroadcast(mediaIntent, null);
@@ -211,10 +209,10 @@ public class BMWiService extends Service
             sendOrderedBroadcast(mediaIntent, null);
           }
         }
-        else if (message.getType() == BusMessage.Type.MFSW_PREVIOUS_PRESSED)
+        else if ( message.getType() == BusMessage.Type.MFSW_PREVIOUS_PRESSED )
         {
           Intent mediaIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
-          synchronized (this)
+          synchronized ( this )
           {
             mediaIntent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PREVIOUS));
             sendOrderedBroadcast(mediaIntent, null);
@@ -223,7 +221,7 @@ public class BMWiService extends Service
             sendOrderedBroadcast(mediaIntent, null);
           }
         }
-        else if (message.getType() == BusMessage.Type.MFSW_DIAL_PRESSED)
+        else if ( message.getType() == BusMessage.Type.MFSW_DIAL_PRESSED )
         {
           // TODO: Call Google Now voice intent
         }
@@ -259,7 +257,7 @@ public class BMWiService extends Service
         UsbDeviceConnection connection = _usbManager.openDevice(_driver.getDevice());
         serialPort = _driver.getPorts().get(0);
 
-        if (connection == null)
+        if ( connection == null )
         {
 
         }
@@ -268,7 +266,7 @@ public class BMWiService extends Service
         serialPort.setParameters(9600, 8, 1, UsbSerialPort.PARITY_EVEN);
 
         byte buffer[] = new byte[1024];
-        while (!Thread.currentThread().isInterrupted())
+        while ( !Thread.currentThread().isInterrupted() )
         {
           int bytesRead = serialPort.read(buffer, 100);
           _messageProcessor.appendBuffer(Arrays.copyOf(buffer, bytesRead));
@@ -276,18 +274,16 @@ public class BMWiService extends Service
         }
 
         serialPort.close();
-      }
-      catch (IOException e)
+      } catch ( IOException e )
       {
         e.printStackTrace();
-      }
-      finally
+      } finally
       {
-        if (serialPort != null)
+        if ( serialPort != null )
           try
           {
             serialPort.close();
-          } catch (IOException e)
+          } catch ( IOException e )
           {
             e.printStackTrace();
           }

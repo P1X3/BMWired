@@ -38,7 +38,7 @@ public class MessageProcessor
 
   private void fireHandler(final BusMessage message)
   {
-    if (_serviceHandler == null)
+    if ( _serviceHandler == null )
       return;
 
     _serviceHandler.post(new Runnable()
@@ -46,10 +46,10 @@ public class MessageProcessor
       @Override
       public void run() // runs on service thread
       {
-          for (EventListener el : _eventListeners)
-          {
-              el.newMessage(message);
-          }
+        for ( EventListener el : _eventListeners )
+        {
+          el.newMessage(message);
+        }
       }
     });
   }
@@ -76,13 +76,13 @@ public class MessageProcessor
    */
   protected void appendBuffer(byte data[])
   {
-    if (data.length > (BUFFER_SIZE - size()))
+    if ( data.length > ( BUFFER_SIZE - size() ) )
       throw new BufferOverflowException();
 
-    for (byte aData : data)
+    for ( byte aData : data )
     {
       _buffer[_bufferHead] = aData;
-      _bufferHead = (_bufferHead + 1) % BUFFER_SIZE;
+      _bufferHead = ( _bufferHead + 1 ) % BUFFER_SIZE;
     }
   }
 
@@ -104,7 +104,7 @@ public class MessageProcessor
    */
   protected byte peek(int offset)
   {
-    return _buffer[(_bufferTail + offset) % BUFFER_SIZE];
+    return _buffer[( _bufferTail + offset ) % BUFFER_SIZE];
   }
 
   /**
@@ -114,23 +114,23 @@ public class MessageProcessor
   protected void process()
   {
     boolean working = true;
-    while (working)
+    while ( working )
     {
-      if (size() >= MSG_MIN_SIZE) // At least five bytes in buffer (minimum message length)
+      if ( size() >= MSG_MIN_SIZE ) // At least five bytes in buffer (minimum message length)
       {
-        int assumedLength = (peek(1)&0xFF) + 2;
-        if (size() >= assumedLength)
+        int assumedLength = ( peek(1) & 0xFF ) + 2;
+        if ( size() >= assumedLength )
         {
           ByteBuffer byteBuffer = ByteBuffer.allocate(assumedLength);
 
-          for (int i = 0; i < assumedLength; i++)
+          for ( int i = 0; i < assumedLength; i++ )
           {
             byteBuffer.put(peek(i));
           }
 
           BusMessage busMessage = BusMessage.tryParse(byteBuffer.array());
 
-          if (busMessage != null)
+          if ( busMessage != null )
           {
             _synced = true;
             truncate(assumedLength);
@@ -158,7 +158,7 @@ public class MessageProcessor
    */
   protected int size()
   {
-    return (BUFFER_SIZE + _bufferHead - _bufferTail) % BUFFER_SIZE;
+    return ( BUFFER_SIZE + _bufferHead - _bufferTail ) % BUFFER_SIZE;
   }
 
   /**
@@ -171,11 +171,12 @@ public class MessageProcessor
 
   /**
    * Truncate certain amount of bytes. Used when buffer is in sync and valid message was read
+   *
    * @param amount The number of bytes
    */
   protected void truncate(int amount)
   {
-    _bufferTail = (_bufferTail + amount) % BUFFER_SIZE;
+    _bufferTail = ( _bufferTail + amount ) % BUFFER_SIZE;
   }
 
   public interface EventListener
