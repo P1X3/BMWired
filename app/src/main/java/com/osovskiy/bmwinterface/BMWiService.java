@@ -129,22 +129,15 @@ public class BMWiService extends Service
 
       if (availableDrivers.size() > 0)
       {
-        for (UsbSerialDriver driver : availableDrivers)
-        {
-          int vendorId = driver.getDevice().getVendorId();
-          int productId = driver.getDevice().getProductId();
+        UsbSerialDriver driver = availableDrivers.get(0);
+        int vendorId = driver.getDevice().getVendorId();
+        int productId = driver.getDevice().getProductId();
 
-          Log.d(TAG, "USB Serial Driver: " + vendorId + "/" + productId);
+        Log.d(TAG, "Using USB Serial Driver: " + vendorId + "/" + productId);
 
-          if (vendorId == 4292 && productId == 34180) // 0x10C4 0x8584
-          //if (vendorId == 4292 && productId == 60000)
-          {
-            _workerThread = new ListeningThread(driver);
-            _workerThread.start();
-            _state = State.LISTENING;
-            break;
-          }
-        }
+        _workerThread = new ListeningThread(driver);
+        _workerThread.start();
+        _state = State.LISTENING;
       }
     }
 
