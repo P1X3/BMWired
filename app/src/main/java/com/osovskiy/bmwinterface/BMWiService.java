@@ -87,6 +87,7 @@ public class BMWiService extends Service
     _usbProbeTable = new ProbeTable();
     _usbProbeTable.addProduct(0x10C4, 0x8584, Cp21xxSerialDriver.class);
 
+    _state = State.IDLING;
     super.onCreate();
   }
 
@@ -238,6 +239,13 @@ public class BMWiService extends Service
     }
   };
 
+  private enum State
+  {
+    STARTING,
+    IDLING,
+    LISTENING
+  }
+
   private class ListeningThread extends Thread
   {
     private UsbSerialDriver _driver;
@@ -245,7 +253,7 @@ public class BMWiService extends Service
     public ListeningThread(UsbSerialDriver driver)
     {
       Log.d(TAG, "ListeningThread Constructor");
-      _state = com.osovskiy.bmwinterface.State.LISTENING;
+      _state = BMWiService.State.LISTENING;
       _driver = driver;
     }
 
