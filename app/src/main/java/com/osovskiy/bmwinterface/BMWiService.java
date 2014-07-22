@@ -36,7 +36,7 @@ public class BMWiService extends Service
 
   private final int WIDGET_UPDATE_DELAY = 1*1000;
 
-  public static final String ACTION_UPDATE_WIDGET = "BMWiService.ACTION_UPDATE_WIDGET";
+  public static final String ACTION_UPDATE_WIDGET_STATUS = "BMWiService.ACTION_UPDATE_WIDGET_STATUS";
   public static final String ACTION_START_SERVICE = "BMWiService.ACTION_START_SERVICE";
   public static final String ACTION_STOP_SERVICE = "BMWiService.ACTION_STOP_SERVICE";
   public static final String EVENT_USB_DEVICE_ATTACHED = "BMWiService.EVENT_USB_DEVICE_ATTACHED";
@@ -108,9 +108,9 @@ public class BMWiService extends Service
     if (intent.getAction() != null)
     {
       Log.d(TAG, "Action: " + intent.getAction());
-      if (intent.getAction().equals(ACTION_UPDATE_WIDGET))
+      if (intent.getAction().equals(ACTION_UPDATE_WIDGET_STATUS))
       {
-        updateWidget();
+        updateWidgetStatus(intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID));
       }
       else if (intent.getAction().equals(ACTION_STOP_SERVICE))
       {
@@ -144,9 +144,9 @@ public class BMWiService extends Service
     return START_STICKY;
   }
 
-  private void updateWidget()
+  private void updateWidgetStatus(int appWidgetId)
   {
-    Log.d(TAG, "updateWidget");
+    Log.d(TAG, "updateWidgetStatus");
 
     if ((System.currentTimeMillis() - _lastWidgetUpdateTime) < WIDGET_UPDATE_DELAY)
       return;
@@ -156,28 +156,28 @@ public class BMWiService extends Service
     SimpleDateFormat sdf = new SimpleDateFormat("dd:MMMM:yyyy HH:mm:ss a");
     Calendar calendar = Calendar.getInstance();
 
-    RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.widget_layout);
+    RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.status_widget_layout);
     remoteViews.setTextViewText(R.id.textSyncStatus, "Sync: " + String.valueOf(_messageProcessor.isSynced()));
     remoteViews.setTextViewText(R.id.textMessagesCount, "Msg: " + String.valueOf(messageCount));
     remoteViews.setTextViewText(R.id.textServiceStatus, "State: " + String.valueOf(_state));
     remoteViews.setTextViewText(R.id.textWorkerStatus, "Worker: " + String.valueOf((_workerThread != null)));
     remoteViews.setTextViewText(R.id.textUpdateTime, "Updated: " + String.valueOf(sdf.format(calendar.getTime())));
 
-    Log.d(TAG, "updateWidget:"+sdf.format(calendar.getTime()));
+    Log.d(TAG, "updateWidgetStatus:"+sdf.format(calendar.getTime()));
 
-    Intent updateWidgetIntent = new Intent(getApplicationContext(),WidgetProvider.class);
-    updateWidgetIntent.setAction(WidgetProvider.UPDATE_CLICKED);
+    Intent updateWidgetIntent = new Intent(getApplicationContext(),StatusWidgetProvider.class);
+    updateWidgetIntent.setAction(StatusWidgetProvider.UPDATE_CLICKED);
     remoteViews.setOnClickPendingIntent(R.id.buttonUpdate, PendingIntent.getBroadcast(getApplicationContext(), 0, updateWidgetIntent, 0));
 
-    Intent startServiceIntent = new Intent(getApplicationContext(),WidgetProvider.class);
-    startServiceIntent.setAction(WidgetProvider.START_CLICKED);
+    Intent startServiceIntent = new Intent(getApplicationContext(),StatusWidgetProvider.class);
+    startServiceIntent.setAction(StatusWidgetProvider.START_CLICKED);
     remoteViews.setOnClickPendingIntent(R.id.buttonStart, PendingIntent.getBroadcast(getApplicationContext(), 0, startServiceIntent, 0));
 
-    Intent stopServiceIntent = new Intent(getApplicationContext(),WidgetProvider.class);
-    stopServiceIntent.setAction(WidgetProvider.STOP_CLICKED);
+    Intent stopServiceIntent = new Intent(getApplicationContext(),StatusWidgetProvider.class);
+    stopServiceIntent.setAction(StatusWidgetProvider.STOP_CLICKED);
     remoteViews.setOnClickPendingIntent(R.id.buttonStop, PendingIntent.getBroadcast(getApplicationContext(), 0, stopServiceIntent, 0));
 
-    ComponentName componentName = new ComponentName(getApplicationContext(), WidgetProvider.class);
+    ComponentName componentName = new ComponentName(getApplicationContext(), StatusWidgetProvider.class);
     AppWidgetManager manager = AppWidgetManager.getInstance(this);
     manager.updateAppWidget(componentName, remoteViews);
   }
@@ -228,7 +228,7 @@ public class BMWiService extends Service
           // TODO: Call Google Now voice intent
         }
       }
-      updateWidget();
+      updateWidgetStatus(0);
     }
   };
 
