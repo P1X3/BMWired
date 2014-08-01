@@ -204,7 +204,13 @@ public class BMWiService extends Service
           {
             mediaIntent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_NEXT));
             sendOrderedBroadcast(mediaIntent, null);
-
+          }
+        }
+        else if ( message.getType() == BusMessage.Type.MFSW_NEXT_RELEASED )
+        {
+          Intent mediaIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+          synchronized ( this )
+          {
             mediaIntent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_NEXT));
             sendOrderedBroadcast(mediaIntent, null);
           }
@@ -216,7 +222,13 @@ public class BMWiService extends Service
           {
             mediaIntent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PREVIOUS));
             sendOrderedBroadcast(mediaIntent, null);
-
+          }
+        }
+        else if ( message.getType() == BusMessage.Type.MFSW_PREVIOUS_RELEASED )
+        {
+          Intent mediaIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+          synchronized ( this )
+          {
             mediaIntent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PREVIOUS));
             sendOrderedBroadcast(mediaIntent, null);
           }
@@ -274,7 +286,8 @@ public class BMWiService extends Service
         }
 
         serialPort.close();
-      } catch ( IOException e )
+      }
+      catch ( IOException e )
       {
         e.printStackTrace();
       } finally
@@ -283,7 +296,8 @@ public class BMWiService extends Service
           try
           {
             serialPort.close();
-          } catch ( IOException e )
+          }
+          catch ( IOException e )
           {
             e.printStackTrace();
           }
