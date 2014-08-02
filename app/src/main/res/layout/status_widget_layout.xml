@@ -11,7 +11,6 @@
     android:id="@+id/buttonStart"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_toRightOf="@+id/buttonUpdate"
     android:text="Start"/>
 
   <Button
@@ -21,18 +20,11 @@
     android:layout_toRightOf="@+id/buttonStart"
     android:text="Stop"/>
 
-  <Button
-    android:id="@+id/buttonUpdate"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_alignParentTop="true"
-    android:text="Update"/>
-
   <TextView
     android:id="@+id/textServiceStatus"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_below="@+id/buttonUpdate"
+    android:layout_below="@+id/buttonStart"
     android:text="Service status"
     android:textAppearance="?android:attr/textAppearanceSmall"/>
 

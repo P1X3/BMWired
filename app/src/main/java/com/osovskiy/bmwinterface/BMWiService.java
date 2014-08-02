@@ -114,6 +114,7 @@ public class BMWiService extends Service
       }
       else if ( intent.getAction().equals(ACTION_STOP_SERVICE) )
       {
+        updateWidgetStatus(1);
         stopSelf();
       }
     }
@@ -151,7 +152,7 @@ public class BMWiService extends Service
 
     _lastWidgetUpdateTime = System.currentTimeMillis();
 
-    SimpleDateFormat sdf = new SimpleDateFormat("dd:MMMM:yyyy HH:mm:ss a");
+    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss a");
     Calendar calendar = Calendar.getInstance();
 
     RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.status_widget_layout);
@@ -165,7 +166,7 @@ public class BMWiService extends Service
 
     Intent updateWidgetIntent = new Intent(getApplicationContext(), StatusWidgetProvider.class);
     updateWidgetIntent.setAction(StatusWidgetProvider.UPDATE_CLICKED);
-    remoteViews.setOnClickPendingIntent(R.id.buttonUpdate, PendingIntent.getBroadcast(getApplicationContext(), 0, updateWidgetIntent, 0));
+    remoteViews.setOnClickPendingIntent(R.id.widgetRelativeLayout, PendingIntent.getBroadcast(getApplicationContext(), 0, updateWidgetIntent, 0));
 
     Intent startServiceIntent = new Intent(getApplicationContext(), StatusWidgetProvider.class);
     startServiceIntent.setAction(StatusWidgetProvider.START_CLICKED);
