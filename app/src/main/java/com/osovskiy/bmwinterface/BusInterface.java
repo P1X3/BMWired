@@ -14,8 +14,10 @@ import com.hoho.android.usbserial.driver.UsbSerialProber;
 import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
+import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * Created by Administrator on 8/1/2014.
@@ -28,6 +30,7 @@ public class BusInterface
   private Handler handler;
 
   private List<EventListener> eventListeners;
+  private Queue<BusMessage> writeQueue;
   private ProbeTable usbProbeTable;
   private WorkerThread workerThread;
 
@@ -37,6 +40,7 @@ public class BusInterface
     this.handler = handler;
 
     eventListeners = new LinkedList<EventListener>();
+    writeQueue = new ArrayDeque<BusMessage>();
 
     usbProbeTable = new ProbeTable();
     usbProbeTable.addProduct(0x10C4, 0x8584, Cp21xxSerialDriver.class);
@@ -47,9 +51,23 @@ public class BusInterface
     eventListeners.add(eventListener);
   }
 
+  public void destroy()
+  {
+    if (workerThread != null)
+      workerThread.interrupt();
+    workerThread = null;
+
+
+  }
+
   public boolean removeEventListener(EventListener eventListener)
   {
     return eventListeners.remove(eventListener);
+  }
+
+  public void send(BusMessage message)
+  {
+    writeQueue.add(message);
   }
 
   public boolean tryOpen()
@@ -158,7 +176,7 @@ public class BusInterface
       try
       {
         byte[] readBuffer = new byte[2048];
-        while ( true ) // TODO: FIX!
+        while ( !Thread.currentThread().isInterrupted() ) // TODO: FIX!
         {
           int bytesRead = port.read(readBuffer, 100);
 
@@ -172,6 +190,12 @@ public class BusInterface
           }
 
           process();
+
+          if (workerThread.size() > 0)
+          {
+            BusMessage msg = writeQueue.remove();
+            port.write(msg.getRaw(), 100);
+          }
         }
       }
       catch ( IOException e )
