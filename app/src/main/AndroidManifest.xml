@@ -28,7 +28,7 @@
       android:name=".BMWiService"
       android:exported="false"
       android:label="BMWinterfaceService"
-      android:process=":bmwinterface"></service>
+      android:process=":bmwinterface"/>
 
     <receiver android:name=".BMWiBroadcastReceiver">
       <intent-filter>
