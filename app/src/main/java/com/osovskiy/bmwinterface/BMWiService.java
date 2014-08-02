@@ -6,8 +6,6 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.usb.UsbDeviceConnection;
-import android.hardware.usb.UsbManager;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.os.IBinder;
@@ -15,17 +13,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.RemoteViews;
 
-import com.hoho.android.usbserial.driver.Cp21xxSerialDriver;
-import com.hoho.android.usbserial.driver.ProbeTable;
-import com.hoho.android.usbserial.driver.UsbSerialDriver;
-import com.hoho.android.usbserial.driver.UsbSerialPort;
-import com.hoho.android.usbserial.driver.UsbSerialProber;
-
-import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.List;
 
 /**
  * Created by Vadim on 6/29/2014.
@@ -42,13 +31,9 @@ public class BMWiService extends Service
   public static final String EVENT_USB_DEVICE_ATTACHED = "BMWiService.EVENT_USB_DEVICE_ATTACHED";
 
   private volatile State _state;
-  private volatile Thread _workerThread;
-  private UsbManager _usbManager;
-  private volatile MessageProcessor _messageProcessor;
-  private ProbeTable _usbProbeTable;
   private AudioManager _audioManager;
-  private Handler _messageProcessorHandler;
   private long _lastWidgetUpdateTime;
+  private BusInterface busInterface;
 
   // Dummy test variables
   private int messageCount = 0;
@@ -72,22 +57,12 @@ public class BMWiService extends Service
     _state = State.STARTING;
     _lastWidgetUpdateTime = 0;
 
-    _messageProcessorHandler = new Handler();
-
-    _usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-    if ( _usbManager == null )
-      Log.d(TAG, "usbmanger null");
-    _messageProcessor = new MessageProcessor();
-    _messageProcessor.addEventListener(messageProcessorListener);
-    _messageProcessor.setServiceHandler(_messageProcessorHandler);
-
     _audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-
-    _usbProbeTable = new ProbeTable();
-    _usbProbeTable.addProduct(0x10C4, 0x8584, Cp21xxSerialDriver.class);
 
     _state = State.IDLING;
 
+    busInterface = new BusInterface(getApplicationContext(), new Handler());
+    busInterface.addEventListener(busInterfaceListener);
     super.onCreate();
   }
 
@@ -95,9 +70,6 @@ public class BMWiService extends Service
   public void onDestroy()
   {
     Log.d(TAG, "onDestroy");
-    if ( _workerThread != null )
-      _workerThread.interrupt();
-
     super.onDestroy();
   }
 
@@ -121,23 +93,10 @@ public class BMWiService extends Service
 
     if ( _state != State.LISTENING )
     {
-      UsbSerialProber usbProber = new UsbSerialProber(_usbProbeTable);
-
-      List<UsbSerialDriver> availableDrivers = usbProber.findAllDrivers(_usbManager);
-      Log.d(TAG, "AvailableDrivers:" + availableDrivers.size());
-
-      if ( availableDrivers.size() > 0 )
-      {
-        UsbSerialDriver driver = availableDrivers.get(0);
-        int vendorId = driver.getDevice().getVendorId();
-        int productId = driver.getDevice().getProductId();
-
-        Log.d(TAG, "Using USB Serial Driver: " + vendorId + "/" + productId);
-        Log.d(TAG, "Starting listening worker");
-        _workerThread = new ListeningThread(driver);
-        _workerThread.start();
+      if ( busInterface.tryOpen() )
         _state = State.LISTENING;
-      }
+      else
+        _state = State.IDLING;
     }
 
     return START_STICKY;
@@ -156,10 +115,8 @@ public class BMWiService extends Service
     Calendar calendar = Calendar.getInstance();
 
     RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.status_widget_layout);
-    remoteViews.setTextViewText(R.id.textSyncStatus, "Sync: " + String.valueOf(_messageProcessor.isSynced()));
     remoteViews.setTextViewText(R.id.textMessagesCount, "Msg: " + String.valueOf(messageCount));
     remoteViews.setTextViewText(R.id.textServiceStatus, "State: " + String.valueOf(_state));
-    remoteViews.setTextViewText(R.id.textWorkerStatus, "Worker: " + String.valueOf(( _workerThread != null )));
     remoteViews.setTextViewText(R.id.textUpdateTime, "Updated: " + String.valueOf(sdf.format(calendar.getTime())));
 
     Log.d(TAG, "updateWidgetStatus:" + sdf.format(calendar.getTime()));
@@ -181,7 +138,7 @@ public class BMWiService extends Service
     manager.updateAppWidget(componentName, remoteViews);
   }
 
-  MessageProcessor.EventListener messageProcessorListener = new MessageProcessor.EventListener()
+  BusInterface.EventListener busInterfaceListener = new BusInterface.EventListener()
   {
     @Override
     public void newMessage(BusMessage message)
@@ -241,6 +198,12 @@ public class BMWiService extends Service
       }
       updateWidgetStatus(0);
     }
+
+    @Override
+    public void newSyncState(boolean sync)
+    {
+
+    }
   };
 
   private enum State
@@ -248,61 +211,5 @@ public class BMWiService extends Service
     STARTING,
     IDLING,
     LISTENING
-  }
-
-  private class ListeningThread extends Thread
-  {
-    private UsbSerialDriver _driver;
-
-    public ListeningThread(UsbSerialDriver driver)
-    {
-      Log.d(TAG, "ListeningThread Constructor");
-      _state = BMWiService.State.LISTENING;
-      _driver = driver;
-    }
-
-    public void run()
-    {
-      Log.d(TAG, "ListeningThread run");
-      UsbSerialPort serialPort = null;
-      try
-      {
-        UsbDeviceConnection connection = _usbManager.openDevice(_driver.getDevice());
-        serialPort = _driver.getPorts().get(0);
-
-        if ( connection == null )
-        {
-
-        }
-
-        serialPort.open(connection);
-        serialPort.setParameters(9600, 8, 1, UsbSerialPort.PARITY_EVEN);
-
-        byte buffer[] = new byte[1024];
-        while ( !Thread.currentThread().isInterrupted() )
-        {
-          int bytesRead = serialPort.read(buffer, 100);
-          _messageProcessor.appendBuffer(Arrays.copyOf(buffer, bytesRead));
-          _messageProcessor.process();
-        }
-
-        serialPort.close();
-      }
-      catch ( IOException e )
-      {
-        e.printStackTrace();
-      } finally
-      {
-        if ( serialPort != null )
-          try
-          {
-            serialPort.close();
-          }
-          catch ( IOException e )
-          {
-            e.printStackTrace();
-          }
-      }
-    }
   }
 }
