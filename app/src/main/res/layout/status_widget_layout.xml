@@ -1,68 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout
+  android:id="@+id/widgetRelativeLayout"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start"
-        android:id="@+id/buttonStart"
-        android:layout_toRightOf="@+id/buttonUpdate" />
+  <Button
+    android:id="@+id/buttonStart"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_toRightOf="@+id/buttonUpdate"
+    android:text="Start"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Stop"
-        android:id="@+id/buttonStop"
-        android:layout_toRightOf="@+id/buttonStart" />
+  <Button
+    android:id="@+id/buttonStop"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_toRightOf="@+id/buttonStart"
+    android:text="Stop"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Update"
-        android:id="@+id/buttonUpdate"
-        android:layout_alignParentTop="true" />
+  <Button
+    android:id="@+id/buttonUpdate"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentTop="true"
+    android:text="Update"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Service status"
-        android:id="@+id/textServiceStatus"
-        android:layout_below="@+id/buttonUpdate" />
+  <TextView
+    android:id="@+id/textServiceStatus"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/buttonUpdate"
+    android:text="Service status"
+    android:textAppearance="?android:attr/textAppearanceSmall"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Worker status"
-        android:id="@+id/textWorkerStatus"
-        android:layout_below="@+id/textServiceStatus"/>
+  <TextView
+    android:id="@+id/textWorkerStatus"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/textServiceStatus"
+    android:text="Worker status"
+    android:textAppearance="?android:attr/textAppearanceSmall"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Sync status"
-        android:id="@+id/textSyncStatus"
-        android:layout_below="@+id/textWorkerStatus"/>
+  <TextView
+    android:id="@+id/textSyncStatus"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/textWorkerStatus"
+    android:text="Sync status"
+    android:textAppearance="?android:attr/textAppearanceSmall"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Messages count"
-        android:id="@+id/textMessagesCount"
-        android:layout_below="@+id/textSyncStatus"/>
+  <TextView
+    android:id="@+id/textMessagesCount"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/textSyncStatus"
+    android:text="Messages count"
+    android:textAppearance="?android:attr/textAppearanceSmall"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Update time"
-        android:id="@+id/textUpdateTime"
-        android:layout_below="@+id/textMessagesCount"/>
+  <TextView
+    android:id="@+id/textUpdateTime"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/textMessagesCount"
+    android:text="Update time"
+    android:textAppearance="?android:attr/textAppearanceSmall"/>
 
 </RelativeLayout>
