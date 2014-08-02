@@ -37,6 +37,19 @@
     </receiver>
 
     <receiver
+      android:name=".ActuationsWidgetProvider"
+      android:icon="@drawable/ic_launcher"
+      android:label="BMWinterface Actuations">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+      </intent-filter>
+
+      <meta-data
+        android:name="android.appwidget.provider"
+        android:resource="@xml/actuations_widget_info"/>
+    </receiver>
+
+    <receiver
       android:name=".StatusWidgetProvider"
       android:icon="@drawable/ic_launcher"
       android:label="BMWinterface Service">

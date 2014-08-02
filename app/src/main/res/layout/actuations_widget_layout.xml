@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+  <Button
+    style="?android:attr/buttonStyleSmall"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Lock"
+    android:id="@+id/buttonLockCar"
+    android:layout_alignParentTop="true"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true"/>
+
+  <Button
+    style="?android:attr/buttonStyleSmall"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Unlock"
+    android:id="@+id/buttonUnlockCar"
+    android:layout_alignParentTop="true"
+    android:layout_toRightOf="@+id/buttonLockCar"
+    android:layout_toEndOf="@+id/buttonLockCar"/>
+</RelativeLayout>

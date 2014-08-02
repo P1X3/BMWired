@@ -28,6 +28,8 @@ public class BMWiService extends Service
   public static final String ACTION_UPDATE_WIDGET_STATUS = "BMWiService.ACTION_UPDATE_WIDGET_STATUS";
   public static final String ACTION_START_SERVICE = "BMWiService.ACTION_START_SERVICE";
   public static final String ACTION_STOP_SERVICE = "BMWiService.ACTION_STOP_SERVICE";
+  public static final String ACTION_LOCK_CAR = "BMWiService.ACTION_LOCK_CAR";
+  public static final String ACTION_UNLOCK_CAR = "BMWiService.ACTION_UNLOCK_CAR";
   public static final String EVENT_USB_DEVICE_ATTACHED = "BMWiService.EVENT_USB_DEVICE_ATTACHED";
 
   private volatile State _state;
@@ -88,6 +90,16 @@ public class BMWiService extends Service
       {
         updateWidgetStatus(1);
         stopSelf();
+      }
+      else if (intent.getAction().equals(ACTION_LOCK_CAR))
+      {
+        BusMessage msg = new BusMessage(BusMessage.Type.GENERAL_LOCK_ALL);
+        busInterface.send(msg);
+      }
+      else if (intent.getAction().equals(ACTION_UNLOCK_CAR))
+      {
+        BusMessage msg = new BusMessage(BusMessage.Type.GENERAL_UNLOCK_ALL);
+        busInterface.send(msg);
       }
     }
 
