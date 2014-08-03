@@ -4,6 +4,7 @@ import android.content.Context;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.os.Handler;
+import android.util.Log;
 
 import com.hoho.android.usbserial.driver.Cp21xxSerialDriver;
 import com.hoho.android.usbserial.driver.ProbeTable;
@@ -24,6 +25,8 @@ import java.util.Queue;
  */
 public class BusInterface
 {
+  private final String TAG = this.getClass().getSimpleName();
+
   private static final int MSG_MIN_SIZE = 5;
 
   private Context context;
@@ -36,6 +39,7 @@ public class BusInterface
 
   public BusInterface(Context context, Handler handler)
   {
+    Log.d(TAG, "Creating BusInterface");
     this.context = context;
     this.handler = handler;
 
@@ -48,11 +52,13 @@ public class BusInterface
 
   public void addEventListener(EventListener eventListener)
   {
+    Log.d(TAG, "Adding new event listener");
     eventListeners.add(eventListener);
   }
 
   public void destroy()
   {
+    Log.d(TAG, "Destroying BusInterface");
     if (workerThread != null)
       workerThread.interrupt();
     workerThread = null;
@@ -62,28 +68,31 @@ public class BusInterface
 
   public boolean removeEventListener(EventListener eventListener)
   {
+    Log.d(TAG, "Removing event listener");
     return eventListeners.remove(eventListener);
   }
 
   public void send(BusMessage message)
   {
+    Log.d(TAG, "Adding new message to write buffer: " + message.toString());
     writeQueue.add(message);
   }
 
   public boolean tryOpen()
   {
+    Log.d(TAG, "Attempting to open serial device");
     UsbSerialProber prober = new UsbSerialProber(usbProbeTable);
     UsbManager manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
 
     List<UsbSerialDriver> availableDrivers = prober.findAllDrivers(manager);
+    Log.d(TAG, "Serial devices available: " + availableDrivers);
     if ( availableDrivers.size() > 0 )
     {
       UsbSerialPort serialPort;
       try
       {
         UsbSerialDriver driver = availableDrivers.get(0);
-        //int vendorId = driver.getDevice().getVendorId();
-        //int productId = driver.getDevice().getProductId();
+        Log.d(TAG, "Opening device " + driver.getDevice().getDeviceName());
 
         UsbDeviceConnection connection = manager.openDevice(driver.getDevice());
         serialPort = driver.getPorts().get(0);
@@ -96,8 +105,10 @@ public class BusInterface
       }
       catch ( IOException e )
       {
+        Log.d(TAG, e.getMessage());
         return false;
       }
+      Log.d(TAG, "Starting worker thread");
       workerThread = new WorkerThread(serialPort);
       return true;
     }
@@ -106,6 +117,7 @@ public class BusInterface
 
   private void fireNewMessage(final BusMessage message)
   {
+    Log.d(TAG, "Firing new message event");
     if ( handler == null )
       return;
 
@@ -124,6 +136,7 @@ public class BusInterface
 
   private void fireNewSync(final boolean sync)
   {
+    Log.d(TAG, "Firing new sync state event");
     if ( handler == null )
       return;
 
@@ -156,6 +169,7 @@ public class BusInterface
 
     public WorkerThread(UsbSerialPort port)
     {
+      Log.d(TAG, "Creating WorkerThread");
       this.port = port;
 
       buffer = new byte[4096];
@@ -166,6 +180,7 @@ public class BusInterface
 
     private void setSync(boolean sync)
     {
+      Log.d(TAG, "Sync state changed to " + sync);
       this.sync = sync;
       fireNewSync(sync);
     }
@@ -242,6 +257,7 @@ public class BusInterface
      */
     private void process()
     {
+      Log.d(TAG, "Starting processing");
       boolean working = true;
       while ( working )
       {
@@ -277,6 +293,7 @@ public class BusInterface
         else
           working = false;
       }
+      Log.d(TAG, "Finished processing");
     }
 
     /**
