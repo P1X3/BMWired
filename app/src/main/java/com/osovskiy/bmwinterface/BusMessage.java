@@ -1,5 +1,8 @@
 package com.osovskiy.bmwinterface;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.hoho.android.usbserial.util.HexDump;
 
 import java.util.Arrays;
@@ -7,13 +10,12 @@ import java.util.Arrays;
 /**
  * Created by Vadim on 6/30/2014.
  */
-public class BusMessage
+public class BusMessage implements Parcelable
 {
   private Device source;
   private Device destination;
   private byte[] payload;
   private byte[] raw;
-  private Type type;
 
   public Device getSource()
   {
@@ -35,10 +37,6 @@ public class BusMessage
     return raw;
   }
 
-  public Type getType()
-  {
-    return type;
-  }
 
   private BusMessage(byte data[])
   {
@@ -46,21 +44,28 @@ public class BusMessage
     source = Device.tryParse(data[0]);
     destination = Device.tryParse(data[2]);
     raw = data;
-    type = Type.tryParse(raw); // TODO: Replace blocking code
   }
 
-  public BusMessage(Type type)
+  private BusMessage(Parcel parcel)
   {
-    raw = type.raw;
-    this.type = type;
+    this.source = (Device)parcel.readSerializable();
+    this.destination = (Device)parcel.readSerializable();
+    parcel.readByteArray(this.payload);
+  }
+
+  private BusMessage(Device source, Device destination, byte[] payload)
+  {
+    this.source = source;
+    this.destination = destination;
+    this.payload = payload;
   }
 
   /**
-   * Try to parse a message from byte array using checksum validation
+   * Build message from byte array if it contains valid data
    * @param msg
    * @return BusMessage or null if checksum is not valid
    */
-  public static BusMessage tryParse(byte[] msg)
+  public static BusMessage build(byte[] msg)
   {
     byte testChecksum = 0;
     for ( int i = 0; i < msg.length - 1; i++ )
@@ -77,43 +82,38 @@ public class BusMessage
   @Override
   public String toString()
   {
-    return "BusMessage[" + (( source == null) ? "null" : source) + " -> " + (( destination == null) ? "null" : destination) + "]{" + (( type == null) ? "null" : type) + "}{" + HexDump.toHexString(payload) + "}";
+    return "BusMessage[" + (( source == null) ? "null" : source) + " -> " + (( destination == null) ? "null" : destination) + "]{" + HexDump.toHexString(payload) + "}";
   }
 
-  public enum Type // TODO: Storing raw messages is redundant
+  @Override
+  public int describeContents()
   {
-    MFSW_VOLUME_UP(new byte[]{ 0x50, 0x04, 0x68, 0x32, 0x11, 0x1F }),
-    MFSW_VOLUME_DOWN(new byte[]{ 0x50, 0x04, 0x68, 0x32, 0x10, 0x1E }),
-    MFSW_NEXT_PRESSED(new byte[]{ 0x50, 0x04, 0x68, 0x3B, 0x01, 0x06 }),
-    MFSW_NEXT_1SEC(new byte[]{ 0x50, 0x04, 0x68, 0x3B, 0x11, 0x16 }),
-    MFSW_NEXT_RELEASED(new byte[]{ 0x50, 0x04, 0x68, 0x3B, 0x21, 0x26 }),
-    MFSW_PREVIOUS_PRESSED(new byte[]{ 0x50, 0x04, 0x68, 0x3B, 0x08, 0x0F }),
-    MFSW_PREVIOUS_1SEC(new byte[]{ 0x50, 0x04, 0x68, 0x3B, 0x18, 0x1F }),
-    MFSW_PREVIOUS_RELEASED(new byte[]{ 0x50, 0x04, 0x68, 0x3B, 0x28, 0x2F }),
-    MFSW_RT(new byte[]{ 0x50, 0x03, (byte) 0xC8, 0x01, (byte) 0x9A }),
-    MFSW_DIAL_PRESSED(new byte[]{ 0x50, 0x04, (byte) 0xC8, 0x3B, (byte) 0x80, 0x27 }),
-    MFSW_DIAL_1SEC(new byte[]{ 0x50, 0x04, (byte) 0xC8, 0x3B, (byte) 0x90, 0x37 }),
-    MFSW_DIAL_RELEASED(new byte[]{ 0x50, 0x04, (byte) 0xC8, 0x3B, (byte) 0xA0, 0x07 }),
-    GENERAL_LOCK_ALL(new byte[]{ 0x3F, 0x05, 0x00, 0x0C, (byte) 0x97, 0x01, (byte) 0xA0 }),
-    GENERAL_UNLOCK_ALL(new byte[]{ 0x00, 0x05, 0x00, 0x0C, (byte) 0x96, 0x01, (byte) 0x9E });
-
-    byte[] raw;
-
-    Type(byte data[])
-    {
-      raw = data;
-    }
-
-    public static Type tryParse(byte data[])
-    {
-      for ( Type t : Type.values() )
-      {
-        if ( Arrays.equals(t.raw, data) )
-          return t;
-      }
-      return null;
-    }
+    return 0;
   }
+
+  @Override
+  public void writeToParcel(Parcel dest, int flags)
+  {
+    dest.writeSerializable(source);
+    dest.writeSerializable(destination);
+    dest.writeByteArray(payload);
+  }
+
+  public static final Parcelable.Creator<BusMessage> CREATOR = new Parcelable.Creator<BusMessage>()
+  {
+
+    @Override
+    public BusMessage createFromParcel(Parcel source)
+    {
+      return new BusMessage(source);
+    }
+
+    @Override
+    public BusMessage[] newArray(int size)
+    {
+      return new BusMessage[size];
+    }
+  };
 
   public enum Device
   {

@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -63,7 +64,8 @@ public class BMWiService extends Service
 
     _state = State.IDLING;
 
-    busInterface = new BusInterface(getApplicationContext(), new Handler());
+    Handler tempHandler = new Handler();
+    busInterface = new BusInterface(getApplicationContext(), tempHandler);
     busInterface.addEventListener(busInterfaceListener);
     super.onCreate();
   }
@@ -214,7 +216,7 @@ public class BMWiService extends Service
     @Override
     public void newSyncState(boolean sync)
     {
-
+      Toast.makeText(getApplicationContext(), "Sync state changed to " + sync, Toast.LENGTH_SHORT).show();
     }
   };
 
