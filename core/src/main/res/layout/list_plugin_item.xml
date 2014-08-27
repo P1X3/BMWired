@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+  <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textAppearance="?android:attr/textAppearanceMedium"
+    android:text="Plugin Name"
+    android:id="@+id/textPluginName"
+    android:layout_alignParentTop="true"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true"/>
+
+  <TextView
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:textAppearance="?android:attr/textAppearanceSmall"
+  android:text="Author:"
+  android:id="@+id/textView2"
+  android:layout_toLeftOf="@+id/textPluginAuthor"/>
+
+  <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    android:text="Vadim Osovskiy"
+    android:id="@+id/textPluginAuthor"
+    android:layout_alignParentRight="true"/>
+
+  <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    android:text="package.name.com"
+    android:id="@+id/textPluginPackage"
+    android:layout_alignParentRight="true"
+    android:layout_below="@+id/textPluginAuthor"/>
+
+</RelativeLayout>
