@@ -10,8 +10,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.osovskiy.bmwinterface.fragment.plugins.PluginsFragment;
-import com.osovskiy.bmwinterface.fragment.Preferences;
-import com.osovskiy.bmwinterface.fragment.Setup;
+import com.osovskiy.bmwinterface.fragment.preferences.PreferencesFragment;
+import com.osovskiy.bmwinterface.fragment.setup.SetupFragment;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -28,8 +28,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener
   public MainActivity()
   {
     fragments.put("Plugins", PluginsFragment.class);
-    fragments.put("Preferences", Preferences.class);
-    fragments.put("Setup", Setup.class);
+    fragments.put("Preferences", PreferencesFragment.class);
+    fragments.put("Setup", SetupFragment.class);
   }
 
   @Override

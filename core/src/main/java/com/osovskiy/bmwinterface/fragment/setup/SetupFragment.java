@@ -1,4 +1,4 @@
-package com.osovskiy.bmwinterface.fragment;
+package com.osovskiy.bmwinterface.fragment.setup;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Created by Administrator on 8/22/2014.
  */
-public class Setup extends Fragment
+public class SetupFragment extends Fragment
 {
   List<String> listDriversString = new ArrayList<>();
   List<UsbSerialDriver> listDrivers = new ArrayList<>();
