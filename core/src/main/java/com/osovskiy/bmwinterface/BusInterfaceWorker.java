@@ -10,24 +10,21 @@ import com.osovskiy.bmwinterface.lib.BusMessage;
 import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.BlockingQueue;
 
-/**
- * Created by Administrator on 8/16/2014.
- */
 public class BusInterfaceWorker extends Thread
 {
-  private static final int MSG_MIN_SIZE = 5;
-
   public static final int MSG_NEW_SYNC_STATE = 0;
   public static final int MSG_NEW_MESSAGE = 1;
-
+  private static final int MSG_MIN_SIZE = 5;
   private final String TAG = this.getClass().getSimpleName();
 
   private UsbSerialPort port;
   private byte[] buffer;
   private int tail, head;
-  private boolean sync;
   private Handler outputHandler;
+  private BusInterface.EventListener eventListener;
+  private BlockingQueue<BusMessage> queue;
 
   private Handler inputHandler = new Handler()
   {
@@ -38,41 +35,54 @@ public class BusInterfaceWorker extends Thread
     }
   };
 
-  public BusInterfaceWorker(UsbSerialPort port, Handler handler)
+  public BusInterfaceWorker(UsbSerialPort port, Handler handler, BusInterface.EventListener el, BlockingQueue<BusMessage> queue)
   {
     Log.d(TAG, "Creating WorkerThread");
     this.port = port;
     this.outputHandler = handler;
-
+    this.eventListener = el;
+    this.queue = queue;
 
     buffer = new byte[4096];
     tail = 0;
     head = 0;
-    sync = false;
   }
+
 
   public Handler getHandler()
   {
     return inputHandler;
   }
 
-  private void setSync(boolean sync)
+  private void fireNewSync(final boolean sync)
   {
     Log.d(TAG, "Sync state changed to " + sync);
-    this.sync = sync;
-
-    Message msg = outputHandler.obtainMessage();
-    msg.arg1 = MSG_NEW_SYNC_STATE;
-    msg.arg2 = ( this.sync ) ? 1 : 0;
-    outputHandler.sendMessage(msg);
+    if ( eventListener != null && outputHandler != null )
+    {
+      outputHandler.post(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          eventListener.newSync(sync);
+        }
+      });
+    }
   }
 
-  private void newMessage(BusMessage message)
+  private void fireNewMessage(final BusMessage message)
   {
-    Message msg = outputHandler.obtainMessage();
-    msg.arg1 = MSG_NEW_MESSAGE;
-    msg.arg2 = ( this.sync ) ? 1 : 0;
-    outputHandler.sendMessage(msg);
+    if ( eventListener != null && outputHandler != null )
+    {
+      outputHandler.post(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          eventListener.newMessage(message);
+        }
+      });
+    }
   }
 
   @Override
@@ -81,7 +91,7 @@ public class BusInterfaceWorker extends Thread
     try
     {
       byte[] readBuffer = new byte[2048];
-      while ( !Thread.currentThread().isInterrupted() ) // TODO: FIX!
+      while ( !Thread.currentThread().isInterrupted() )
       {
         int bytesRead = port.read(readBuffer, 100);
 
@@ -96,16 +106,20 @@ public class BusInterfaceWorker extends Thread
 
         process();
 
-        /*if ( wri.size() > 0 )
+        while ( queue.size() > 0 )
         {
-          BusMessage msg = writeQueue.remove();
-          port.write(msg.getRaw(), 100);
-        }*/
+          BusMessage msg = queue.take();
+          port.write(msg.build(), 0);
+        }
       }
     }
     catch ( IOException e )
     {
 
+    }
+    catch ( InterruptedException e )
+    {
+      e.printStackTrace();
     }
     finally
     {
@@ -167,13 +181,13 @@ public class BusInterfaceWorker extends Thread
 
           if ( busMessage != null )
           {
-            setSync(true);
+            fireNewSync(true);
             truncate(assumedLength);
-            newMessage(busMessage);
+            fireNewMessage(busMessage);
           }
           else
           {
-            setSync(false);
+            fireNewSync(false);
             truncate();
           }
         }

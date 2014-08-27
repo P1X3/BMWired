@@ -17,9 +17,9 @@ import com.osovskiy.bmwinterface.lib.BusMessage;
 import com.osovskiy.bmwinterface.lib.Utils;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
 import java.util.List;
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by Administrator on 8/1/2014.
@@ -30,9 +30,10 @@ public class BusInterface
 
   private Context context;
 
-  private Queue<BusMessage> writeQueue;
   private ProbeTable usbProbeTable;
   private BusInterfaceWorker workerThread;
+  private EventListener eventListener;
+  private BlockingQueue<BusMessage> queue = new LinkedBlockingQueue<>();
 
   private Handler newMessageHandler = new Handler()
   {
@@ -48,22 +49,22 @@ public class BusInterface
         case BusInterfaceWorker.MSG_NEW_MESSAGE:
           BusMessage msg = message.getData().getParcelable("msg");
           Intent newMsgIntent = new Intent(Utils.ACTION_NEW_BUS_MESSAGE);
-          newMsgIntent.putExtra(BusMessage.class.getCanonicalName(), msg);
+          newMsgIntent.putExtra(BusMessage.class.getSimpleName(), msg);
           context.sendBroadcast(newMsgIntent, Utils.PERMISSION_RECEIVE_MESSAGE);
           break;
       }
     }
   };
 
-  public BusInterface(Context context, Handler handler)
+  public BusInterface(Context context, Handler handler, EventListener el)
   {
     Log.d(TAG, "Creating BusInterface");
     this.context = context;
 
-    writeQueue = new ArrayDeque<BusMessage>();
-
     usbProbeTable = new ProbeTable();
     usbProbeTable.addProduct(0x10C4, 0x8584, Cp21xxSerialDriver.class);
+
+    eventListener = el;
   }
 
   public void destroy()
@@ -74,14 +75,11 @@ public class BusInterface
     workerThread = null;
   }
 
-  public void send(BusMessage message)
-  {
-    Log.d(TAG, "Adding new message to write buffer: " + message.toString());
-    writeQueue.add(message);
-  }
-
   public boolean tryOpen()
   {
+    if ( workerThread != null )
+      return true;
+
     Log.d(TAG, "Attempting to open serial device");
     UsbSerialProber prober = new UsbSerialProber(usbProbeTable);
     UsbManager manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
@@ -111,9 +109,21 @@ public class BusInterface
         return false;
       }
       Log.d(TAG, "Starting worker thread");
-      workerThread = new BusInterfaceWorker(serialPort, newMessageHandler);
+      workerThread = new BusInterfaceWorker(serialPort, newMessageHandler, eventListener, queue);
       return true;
     }
     return false;
+  }
+
+  public void sendMsg(BusMessage message)
+  {
+    queue.add(message);
+  }
+
+  public interface EventListener
+  {
+    void newMessage(BusMessage message);
+
+    void newSync(boolean sync);
   }
 }
