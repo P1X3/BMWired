@@ -3,17 +3,14 @@ package com.osovskiy.bmwinterface.lib;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-/**
- * Created by Administrator on 8/22/2014.
- */
 public class BusMessage implements Parcelable
 {
   private BusDevice source;
   private BusDevice destination;
   private byte[] payload;
-  private byte[] raw;
 
   public BusDevice getSource()
   {
@@ -30,18 +27,11 @@ public class BusMessage implements Parcelable
     return payload;
   }
 
-  public byte[] getRaw()
-  {
-    return raw;
-  }
-
-
   private BusMessage(byte data[])
   {
     payload = Arrays.copyOfRange(data, 3, data.length - 2);
     source = BusDevice.tryParse(data[0]);
     destination = BusDevice.tryParse(data[2]);
-    raw = data;
   }
 
   private BusMessage(Parcel parcel)
@@ -77,6 +67,32 @@ public class BusMessage implements Parcelable
       return null;
 
     return new BusMessage(msg);
+  }
+
+  public byte[] build()
+  {
+    ByteBuffer bb = ByteBuffer.allocate(payload.length + 4);
+
+    byte length = (byte) (bb.capacity() - 2);
+
+    bb.put(source.getId());
+    bb.put(length);
+    bb.put(destination.getId());
+    bb.put(payload);
+    bb.put(calculateChecksum());
+
+    return bb.array();
+  }
+
+  public byte calculateChecksum()
+  {
+    byte checksum = source.getId();
+    checksum ^= (byte)(payload.length+2);
+    checksum ^= destination.getId();
+    for (byte b: payload)
+      checksum^= b;
+
+    return checksum;
   }
 
   @Override
