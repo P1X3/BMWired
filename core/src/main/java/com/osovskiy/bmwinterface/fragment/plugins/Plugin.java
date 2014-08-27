@@ -9,6 +9,13 @@ public class Plugin
   private String author;
   private String pkg;
 
+  public Plugin(String name, String author, String pkg)
+  {
+    this.name = name;
+    this.author = author;
+    this.pkg = pkg;
+  }
+
   public String getName()
   {
     return name;
@@ -22,12 +29,5 @@ public class Plugin
   public String getPackage()
   {
     return pkg;
-  }
-
-  public Plugin(String name, String author, String pkg)
-  {
-    this.name = name;
-    this.author = author;
-    this.pkg = pkg;
   }
 }

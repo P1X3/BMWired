@@ -4,6 +4,6 @@
 
   <CheckBoxPreference
     android:key="checkbox_test"
-    android:title="Title"
-    android:summary="Summary haha test dummy lol"/>
+    android:summary="Summary haha test dummy lol"
+    android:title="Title"/>
 </PreferenceScreen>

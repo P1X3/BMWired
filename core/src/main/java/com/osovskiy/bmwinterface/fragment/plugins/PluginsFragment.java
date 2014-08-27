@@ -1,7 +1,6 @@
 package com.osovskiy.bmwinterface.fragment.plugins;
 
 import android.app.ListFragment;
-import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
@@ -13,7 +12,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.osovskiy.bmwinterface.R;
@@ -56,7 +54,7 @@ public class PluginsFragment extends ListFragment
   @Override
   public boolean onOptionsItemSelected(MenuItem item)
   {
-    switch (item.getItemId())
+    switch ( item.getItemId() )
     {
       case R.id.actions_refresh:
         new LoadPluginsTask().execute();
@@ -84,11 +82,11 @@ public class PluginsFragment extends ListFragment
         {
           Log.d("TAG", "Found one");
           Bundle metaData = packageInfo.metaData;
-          if (metaData != null)
+          if ( metaData != null )
           {
             String name = String.valueOf(packageInfo.loadLabel(pm));
             String author = metaData.getString("plugin_author");
-            pluginsList.add(new Plugin(name,author, packageInfo.packageName));
+            pluginsList.add(new Plugin(name, author, packageInfo.packageName));
           }
         }
       }

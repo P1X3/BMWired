@@ -5,52 +5,52 @@
                 android:layout_height="match_parent">
 
   <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceMedium"
-    android:text="Driver name inserted here"
     android:id="@+id/textDriverName"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true"
     android:layout_alignParentTop="true"
-    android:layout_alignParentLeft="true"
-    android:layout_alignParentStart="true"/>
+    android:text="Driver name inserted here"
+    android:textAppearance="?android:attr/textAppearanceMedium"/>
 
   <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    android:text="Vendor ID:"
     android:id="@+id/textView2"
-    android:layout_below="@+id/textDriverName"
-    android:layout_alignParentLeft="true"
-    android:layout_alignParentStart="true"/>
-
-  <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    android:text="0xBEEF"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true"
+    android:layout_below="@+id/textDriverName"
+    android:text="Vendor ID:"
+    android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+  <TextView
     android:id="@+id/textVendId"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:layout_below="@+id/textDriverName"
+    android:layout_toEndOf="@+id/textView2"
     android:layout_toRightOf="@+id/textView2"
-    android:layout_toEndOf="@+id/textView2"/>
+    android:text="0xBEEF"
+    android:textAppearance="?android:attr/textAppearanceSmall"/>
 
   <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    android:text="Product ID:"
     android:id="@+id/textView4"
-    android:layout_below="@+id/textView2"
-    android:layout_alignParentLeft="true"
-    android:layout_alignParentStart="true"/>
-
-  <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    android:text="0xDEAD"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true"
+    android:layout_below="@+id/textView2"
+    android:text="Product ID:"
+    android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+  <TextView
     android:id="@+id/textProdId"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:layout_alignTop="@+id/textView4"
+    android:layout_toEndOf="@+id/textView2"
     android:layout_toRightOf="@+id/textView2"
-    android:layout_toEndOf="@+id/textView2"/>
+    android:text="0xDEAD"
+    android:textAppearance="?android:attr/textAppearanceSmall"/>
 </RelativeLayout>

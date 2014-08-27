@@ -2,7 +2,6 @@ package com.osovskiy.bmwinterface.fragment.plugins;
 
 import android.app.Activity;
 import android.content.Context;
-import android.hardware.usb.UsbDevice;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,9 +40,9 @@ public class PluginListAdapter extends ArrayAdapter<Plugin>
 
     Plugin plugin = objects.get(position);
 
-    ((TextView)convertView.findViewById(R.id.textPluginName)).setText(plugin.getName());
-    ((TextView)convertView.findViewById(R.id.textPluginAuthor)).setText(plugin.getAuthor());
-    ((TextView)convertView.findViewById(R.id.textPluginPackage)).setText(plugin.getPackage());
+    ( (TextView) convertView.findViewById(R.id.textPluginName) ).setText(plugin.getName());
+    ( (TextView) convertView.findViewById(R.id.textPluginAuthor) ).setText(plugin.getAuthor());
+    ( (TextView) convertView.findViewById(R.id.textPluginPackage) ).setText(plugin.getPackage());
 
     return convertView;
   }

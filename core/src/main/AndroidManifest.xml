@@ -10,14 +10,14 @@
 
   <permission
     android:name="com.osovskiy.bmwinterface.permission.RECEIVE_MSG_PERMISSION"
-    android:label="@string/label_permission_receive"
     android:description="@string/desc_permission_receive"
+    android:label="@string/label_permission_receive"
     android:protectionLevel="normal"/>
 
   <permission
     android:name="com.osovskiy.bmwinterface.permission.SEND_MSG_PERMISSION"
-    android:label="@string/label_permission_send"
     android:description="@string/desc_permission_send"
+    android:label="@string/label_permission_send"
     android:protectionLevel="normal"/>
 
   <application
@@ -47,41 +47,6 @@
       android:exported="false"
       android:label="BMWinterfaceService"
       android:process=":bmwinterface"/>
-
-    <receiver
-      android:name=".BMWiReceiver"
-      android:permission="com.osovskiy.bmwinterface.permission.SEND_MSG_PERMISSION">
-      <intent-filter>
-        <action android:name="android.intent.action.BOOT_COMPLETED"/>
-        <action android:name="com.osovskiy.bmwinterface.ACTION_SEND_BUS_MESSAGE"/>
-      </intent-filter>
-    </receiver>
-
-    <receiver
-      android:name=".ActuationsWidgetProvider"
-      android:icon="@drawable/ic_launcher"
-      android:label="BMWinterface Actuations">
-      <intent-filter>
-        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
-      </intent-filter>
-
-      <meta-data
-        android:name="android.appwidget.provider"
-        android:resource="@xml/actuations_widget_info"/>
-    </receiver>
-
-    <receiver
-      android:name=".StatusWidgetProvider"
-      android:icon="@drawable/ic_launcher"
-      android:label="BMWinterface Service">
-      <intent-filter>
-        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
-      </intent-filter>
-
-      <meta-data
-        android:name="android.appwidget.provider"
-        android:resource="@xml/status_widget_info"/>
-    </receiver>
 
   </application>
 

@@ -5,8 +5,12 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Messenger;
 import android.util.Log;
 
 import com.osovskiy.bmwinterface.fragment.debugging.DebuggingFragment;
@@ -26,6 +30,26 @@ public class MainActivity extends Activity implements ActionBar.TabListener
 {
   private Map<String, Class<? extends Fragment>> fragments = new LinkedHashMap<>();
 
+  private boolean serviceBound = false;
+  private Messenger serviceMessenger = null;
+
+  private ServiceConnection serviceConnection = new ServiceConnection()
+  {
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service)
+    {
+      serviceMessenger = new Messenger(service);
+      serviceBound = true;
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name)
+    {
+      serviceMessenger = null;
+      serviceBound = false;
+    }
+  };
+
   public MainActivity()
   {
     fragments.put("Plugins", PluginsFragment.class);
@@ -35,10 +59,30 @@ public class MainActivity extends Activity implements ActionBar.TabListener
   }
 
   @Override
+  protected void onStart()
+  {
+    super.onStart();
+
+    bindService(new Intent(this, BMWiService.class), serviceConnection, 0);
+  }
+
+  @Override
+  protected void onStop()
+  {
+    super.onStop();
+
+    if ( serviceBound )
+    {
+      unbindService(serviceConnection);
+      serviceBound = false;
+    }
+  }
+
+  @Override
   protected void onCreate(Bundle savedInstanceState)
   {
     String action = getIntent().getAction();
-    if (action != null && action.equals("android.hardware.usb.action.USB_DEVICE_ATTACHED"))
+    if ( action != null && action.equals("android.hardware.usb.action.USB_DEVICE_ATTACHED") )
     {
       Intent service = new Intent(getApplicationContext(), BMWiService.class);
       service.setAction(BMWiService.EVENT_USB_DEVICE_ATTACHED);
@@ -74,6 +118,10 @@ public class MainActivity extends Activity implements ActionBar.TabListener
       Class<? extends Fragment> fragmentClass = fragments.get(tabName);
       Constructor<? extends Fragment> fragmentConstructor = fragmentClass.getConstructor();
       fragment = fragmentConstructor.newInstance();
+
+      Bundle bundle = new Bundle();
+      bundle.putParcelable(Messenger.class.getSimpleName(), serviceMessenger);
+      fragment.setArguments(bundle);
     }
     catch ( NoSuchMethodException e )
     {

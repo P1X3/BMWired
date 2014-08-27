@@ -2,6 +2,7 @@ package com.osovskiy.bmwinterface.fragment.debugging;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.os.Messenger;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +14,12 @@ import com.osovskiy.bmwinterface.R;
  */
 public class DebuggingFragment extends Fragment
 {
+  Messenger messenger;
+
   @Override
   public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
   {
+    messenger = getArguments().getParcelable(Messenger.class.getSimpleName());
     View v = inflater.inflate(R.layout.fragment_debugging, container, false);
     return v;
   }
