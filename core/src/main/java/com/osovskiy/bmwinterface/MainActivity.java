@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.osovskiy.bmwinterface.fragment.debugging.DebuggingFragment;
 import com.osovskiy.bmwinterface.fragment.plugins.PluginsFragment;
 import com.osovskiy.bmwinterface.fragment.preferences.PreferencesFragment;
 import com.osovskiy.bmwinterface.fragment.setup.SetupFragment;
@@ -30,6 +31,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener
     fragments.put("Plugins", PluginsFragment.class);
     fragments.put("Preferences", PreferencesFragment.class);
     fragments.put("Setup", SetupFragment.class);
+    fragments.put("Debugging", DebuggingFragment.class);
   }
 
   @Override
