@@ -1,39 +1,61 @@
 package com.osovskiy.bmwinterface;
 
-import android.app.PendingIntent;
 import android.app.Service;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
 import android.util.Log;
-import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.osovskiy.bmwinterface.lib.BusMessage;
 import com.osovskiy.bmwinterface.lib.Utils;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
-/**
- * Created by Vadim on 6/29/2014.
- */
 public class BMWiService extends Service
 {
-  private final String TAG = this.getClass().getSimpleName();
-
-  private final int WIDGET_UPDATE_DELAY = 1 * 1000;
-
-  public static final String ACTION_UPDATE_WIDGET_STATUS = "BMWiService.ACTION_UPDATE_WIDGET_STATUS";
-  public static final String ACTION_START_SERVICE = "BMWiService.ACTION_START_SERVICE";
   public static final String ACTION_STOP_SERVICE = "BMWiService.ACTION_STOP_SERVICE";
-  public static final String ACTION_LOCK_CAR = "BMWiService.ACTION_LOCK_CAR";
-  public static final String ACTION_UNLOCK_CAR = "BMWiService.ACTION_UNLOCK_CAR";
   public static final String EVENT_USB_DEVICE_ATTACHED = "BMWiService.EVENT_USB_DEVICE_ATTACHED";
+  public static final int MSG_REGISTER_CLIENT = 0;
+  public static final int MSG_UNREGISTER_CLIENT = 1;
+  public static final int MSG_SENDTO_BUS = 2;
+  private final String TAG = this.getClass().getSimpleName();
+  private final BusInterface.EventListener eventListener = new BusInterface.EventListener()
+  {
+    @Override
+    public void newMessage(BusMessage message)
+    {
+      Intent intent = new Intent(Utils.ACTION_NEW_BUS_MESSAGE);
+      intent.putExtra(BusMessage.class.getSimpleName(), message);
+      sendBroadcast(intent);
+    }
 
-  private volatile State _state;
-  private long _lastWidgetUpdateTime;
+    @Override
+    public void newSync(boolean sync)
+    {
+      Log.d(TAG, "New sync state: " + sync);
+    }
+  };
+  private final Messenger messenger = new Messenger(new IncomingHandler());
+  private final BroadcastReceiver receiver = new BroadcastReceiver()
+  {
+    @Override
+    public void onReceive(Context context, Intent intent)
+    {
+      if ( intent.getAction() != null )
+      {
+        Toast.makeText(context, intent.getAction(), Toast.LENGTH_SHORT).show();
+
+        if ( intent.getAction().equals(Utils.ACTION_SEND_BUS_MESSAGE) )
+        {
+          busInterface.sendMsg((BusMessage) intent.getParcelableExtra(BusMessage.class.getSimpleName()));
+        }
+      }
+    }
+  };
   private BusInterface busInterface;
 
   public BMWiService()
@@ -45,19 +67,20 @@ public class BMWiService extends Service
   public IBinder onBind(Intent intent)
   {
     Log.d(TAG, "onBind");
-    return null;
+    return messenger.getBinder();
   }
 
   @Override
   public void onCreate()
   {
     Log.d(TAG, "onCreate");
-    _state = State.STARTING;
-    _lastWidgetUpdateTime = 0;
-    _state = State.IDLING;
 
-    Handler tempHandler = new Handler();
-    busInterface = new BusInterface(getApplicationContext(), tempHandler);
+    busInterface = new BusInterface(getApplicationContext(), new Handler(), eventListener);
+
+    IntentFilter intentFilter = new IntentFilter();
+    intentFilter.addAction(Intent.ACTION_BOOT_COMPLETED); // TODO: Check if this actually works
+    intentFilter.addAction(Utils.ACTION_SEND_BUS_MESSAGE);
+    registerReceiver(receiver, intentFilter, Utils.PERMISSION_SEND_MESSAGE, null);
     super.onCreate();
   }
 
@@ -69,6 +92,8 @@ public class BMWiService extends Service
     if ( busInterface != null )
       busInterface.destroy();
 
+    unregisterReceiver(receiver);
+
     super.onDestroy();
   }
 
@@ -79,79 +104,36 @@ public class BMWiService extends Service
     if ( intent.getAction() != null )
     {
       Log.d(TAG, "Action: " + intent.getAction());
-      if ( intent.getAction().equals(ACTION_UPDATE_WIDGET_STATUS) )
+      if ( intent.getAction().equals(ACTION_STOP_SERVICE) )
       {
-        updateWidgetStatus(intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID));
-      }
-      else if ( intent.getAction().equals(ACTION_STOP_SERVICE) )
-      {
-        updateWidgetStatus(1);
         stopSelf();
       }
-      else if ( intent.getAction().equals(ACTION_LOCK_CAR) )
-      {
-        Log.d(TAG, "Broadcasting");
-        Intent testIntent = new Intent(Utils.ACTION_NEW_BUS_MESSAGE);
-        BusMessage msg = BusMessage.tryParse(new byte[]{ 0x3F, 0x05, 0x00, 0x0C, 0x41, 0x01, 0x76 });
-        testIntent.putExtra("msg", msg);
-        sendBroadcast(testIntent);
-      }
-      else if ( intent.getAction().equals(ACTION_UNLOCK_CAR) )
-      {
-
-      }
     }
 
-    if ( _state != State.LISTENING )
-    {
-      if ( busInterface.tryOpen() )
-        _state = State.LISTENING;
-      else
-        _state = State.IDLING;
-    }
+    busInterface.tryOpen();
 
     return START_STICKY;
   }
 
-  private void updateWidgetStatus(int appWidgetId)
+  private class IncomingHandler extends Handler
   {
-    Log.d(TAG, "updateWidgetStatus");
+    @Override
+    public void handleMessage(Message msg)
+    {
+      switch ( msg.what )
+      {
+        case MSG_REGISTER_CLIENT:
 
-    if ( ( System.currentTimeMillis() - _lastWidgetUpdateTime ) < WIDGET_UPDATE_DELAY )
-      return;
+          break;
+        case MSG_UNREGISTER_CLIENT:
 
-    _lastWidgetUpdateTime = System.currentTimeMillis();
-
-    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss a");
-    Calendar calendar = Calendar.getInstance();
-
-    RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.status_widget_layout);
-    remoteViews.setTextViewText(R.id.textServiceStatus, "State: " + String.valueOf(_state));
-    remoteViews.setTextViewText(R.id.textUpdateTime, "Updated: " + String.valueOf(sdf.format(calendar.getTime())));
-
-    Log.d(TAG, "updateWidgetStatus:" + sdf.format(calendar.getTime()));
-
-    Intent updateWidgetIntent = new Intent(getApplicationContext(), StatusWidgetProvider.class);
-    updateWidgetIntent.setAction(StatusWidgetProvider.UPDATE_CLICKED);
-    remoteViews.setOnClickPendingIntent(R.id.widgetRelativeLayout, PendingIntent.getBroadcast(getApplicationContext(), 0, updateWidgetIntent, 0));
-
-    Intent startServiceIntent = new Intent(getApplicationContext(), StatusWidgetProvider.class);
-    startServiceIntent.setAction(StatusWidgetProvider.START_CLICKED);
-    remoteViews.setOnClickPendingIntent(R.id.buttonStart, PendingIntent.getBroadcast(getApplicationContext(), 0, startServiceIntent, 0));
-
-    Intent stopServiceIntent = new Intent(getApplicationContext(), StatusWidgetProvider.class);
-    stopServiceIntent.setAction(StatusWidgetProvider.STOP_CLICKED);
-    remoteViews.setOnClickPendingIntent(R.id.buttonStop, PendingIntent.getBroadcast(getApplicationContext(), 0, stopServiceIntent, 0));
-
-    ComponentName componentName = new ComponentName(getApplicationContext(), StatusWidgetProvider.class);
-    AppWidgetManager manager = AppWidgetManager.getInstance(this);
-    manager.updateAppWidget(componentName, remoteViews);
-  }
-
-  private enum State
-  {
-    STARTING,
-    IDLING,
-    LISTENING
+          break;
+        case MSG_SENDTO_BUS:
+          busInterface.sendMsg((BusMessage) msg.getData().getParcelable(BusMessage.class.getSimpleName()));
+          break;
+        default:
+          super.handleMessage(msg);
+      }
+    }
   }
 }
