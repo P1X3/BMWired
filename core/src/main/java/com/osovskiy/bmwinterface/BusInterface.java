@@ -35,27 +35,6 @@ public class BusInterface
   private EventListener eventListener;
   private BlockingQueue<BusMessage> queue = new LinkedBlockingQueue<>();
 
-  private Handler newMessageHandler = new Handler()
-  {
-    @Override
-    public void handleMessage(Message message)
-    {
-      switch ( message.arg1 )
-      {
-        case BusInterfaceWorker.MSG_NEW_SYNC_STATE:
-          boolean sync = ( message.arg2 == 1 );
-
-          break;
-        case BusInterfaceWorker.MSG_NEW_MESSAGE:
-          BusMessage msg = message.getData().getParcelable("msg");
-          Intent newMsgIntent = new Intent(Utils.ACTION_NEW_BUS_MESSAGE);
-          newMsgIntent.putExtra(BusMessage.class.getSimpleName(), msg);
-          context.sendBroadcast(newMsgIntent, Utils.PERMISSION_RECEIVE_MESSAGE);
-          break;
-      }
-    }
-  };
-
   public BusInterface(Context context, Handler handler, EventListener el)
   {
     Log.d(TAG, "Creating BusInterface");
@@ -109,7 +88,7 @@ public class BusInterface
         return false;
       }
       Log.d(TAG, "Starting worker thread");
-      workerThread = new BusInterfaceWorker(serialPort, newMessageHandler, eventListener, queue);
+      workerThread = new BusInterfaceWorker(serialPort, new Handler(), eventListener, queue);
       return true;
     }
     return false;

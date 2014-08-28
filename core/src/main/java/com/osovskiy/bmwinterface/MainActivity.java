@@ -81,6 +81,9 @@ public class MainActivity extends Activity implements ActionBar.TabListener
   @Override
   protected void onCreate(Bundle savedInstanceState)
   {
+    Intent intent = new Intent(this, BMWiService.class);
+    startService(intent);
+
     String action = getIntent().getAction();
     if ( action != null && action.equals("android.hardware.usb.action.USB_DEVICE_ATTACHED") )
     {

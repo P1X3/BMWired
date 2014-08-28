@@ -26,15 +26,6 @@ public class BusInterfaceWorker extends Thread
   private BusInterface.EventListener eventListener;
   private BlockingQueue<BusMessage> queue;
 
-  private Handler inputHandler = new Handler()
-  {
-    @Override
-    public void handleMessage(Message msg)
-    {
-      super.handleMessage(msg);
-    }
-  };
-
   public BusInterfaceWorker(UsbSerialPort port, Handler handler, BusInterface.EventListener el, BlockingQueue<BusMessage> queue)
   {
     Log.d(TAG, "Creating WorkerThread");
@@ -46,12 +37,6 @@ public class BusInterfaceWorker extends Thread
     buffer = new byte[4096];
     tail = 0;
     head = 0;
-  }
-
-
-  public Handler getHandler()
-  {
-    return inputHandler;
   }
 
   private void fireNewSync(final boolean sync)
