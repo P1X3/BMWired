@@ -22,12 +22,14 @@ public class BMWiService extends Service
   public static final int MSG_REGISTER_CLIENT = 0;
   public static final int MSG_UNREGISTER_CLIENT = 1;
   public static final int MSG_SENDTO_BUS = 2;
+  public static final int MSG_SENDFROM_BUS = 3;
   private final String TAG = this.getClass().getSimpleName();
   private final BusInterface.EventListener eventListener = new BusInterface.EventListener()
   {
     @Override
     public void newMessage(BusMessage message)
     {
+      Log.d(TAG, "Broadcasting new message from bus");
       Intent intent = new Intent(Utils.ACTION_NEW_BUS_MESSAGE);
       intent.putExtra(BusMessage.class.getSimpleName(), message);
       sendBroadcast(intent);
@@ -45,12 +47,14 @@ public class BMWiService extends Service
     @Override
     public void onReceive(Context context, Intent intent)
     {
+      Log.d(TAG, "New broadcast message");
       if ( intent.getAction() != null )
       {
         Toast.makeText(context, intent.getAction(), Toast.LENGTH_SHORT).show();
 
         if ( intent.getAction().equals(Utils.ACTION_SEND_BUS_MESSAGE) )
         {
+          Log.d(TAG, "Sending new message to bus");
           busInterface.sendMsg((BusMessage) intent.getParcelableExtra(BusMessage.class.getSimpleName()));
         }
       }
@@ -78,7 +82,6 @@ public class BMWiService extends Service
     busInterface = new BusInterface(getApplicationContext(), new Handler(), eventListener);
 
     IntentFilter intentFilter = new IntentFilter();
-    intentFilter.addAction(Intent.ACTION_BOOT_COMPLETED); // TODO: Check if this actually works
     intentFilter.addAction(Utils.ACTION_SEND_BUS_MESSAGE);
     registerReceiver(receiver, intentFilter, Utils.PERMISSION_SEND_MESSAGE, null);
     super.onCreate();
@@ -115,6 +118,9 @@ public class BMWiService extends Service
     return START_STICKY;
   }
 
+  /**
+   * Handler for incoming messages from bound clients
+   */
   private class IncomingHandler extends Handler
   {
     @Override
@@ -129,7 +135,12 @@ public class BMWiService extends Service
 
           break;
         case MSG_SENDTO_BUS:
+          msg.getData().setClassLoader(BusMessage.class.getClassLoader());
           busInterface.sendMsg((BusMessage) msg.getData().getParcelable(BusMessage.class.getSimpleName()));
+          break;
+        case MSG_SENDFROM_BUS:
+          msg.getData().setClassLoader(BusMessage.class.getClassLoader());
+          eventListener.newMessage((BusMessage) msg.getData().getParcelable(BusMessage.class.getSimpleName()));
           break;
         default:
           super.handleMessage(msg);

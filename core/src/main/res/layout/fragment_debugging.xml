@@ -4,4 +4,30 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+  <ListView
+    android:id="@+id/lvDebuggingMessages"
+    android:layout_width="fill_parent"
+    android:layout_height="256dp"></ListView>
+
+  <Button
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/buttonSendToBus"
+    android:text="Send to bus"
+    android:layout_below="@id/lvDebuggingMessages"/>
+
+  <CheckBox
+    android:id="@+id/checkboxBroadcast"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_toRightOf="@id/buttonSendToBus"
+    android:layout_alignBottom="@id/buttonSendToBus"
+    android:text="Broadcast"/>
+
+  <Button
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/buttonSendFromService"
+    android:text="Send from service"
+    android:layout_below="@id/buttonSendToBus"/>
 </RelativeLayout>
