@@ -1,6 +1,7 @@
 package com.osovskiy.bmwinterface.fragment.plugins;
 
 import android.app.ListFragment;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
@@ -12,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.osovskiy.bmwinterface.R;
@@ -49,6 +51,16 @@ public class PluginsFragment extends ListFragment
     setListAdapter(adapter);
 
     return super.onCreateView(inflater, container, savedInstanceState);
+  }
+
+  @Override
+  public void onListItemClick(ListView l, View v, int position, long id)
+  {
+    super.onListItemClick(l, v, position, id);
+    Plugin plugin = pluginsList.get(position);
+    PackageManager pm = getActivity().getPackageManager();
+    Intent intent = pm.getLaunchIntentForPackage(plugin.getPackage());
+    startActivity(intent);
   }
 
   @Override
