@@ -18,3 +18,4 @@ proguard/
 # Extra
 usbSerialForAndroid/
 *.apk
+*.html
