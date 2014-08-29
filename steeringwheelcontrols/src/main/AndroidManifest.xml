@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+  package="com.osovskiy.bmwinterface.plugin.steeringwheelcontrols"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <uses-permission android:name="com.osovskiy.bmwinterface.permission.RECEIVE_MSG_PERMISSION"/>
+
+  <application
+    android:allowBackup="true"
+    android:icon="@drawable/ic_launcher"
+    android:label="@string/app_name">
+    <activity
+      android:name=".MainActivity"
+      android:label="@string/app_name">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN"/>
+
+        <category android:name="android.intent.category.LAUNCHER"/>
+      </intent-filter>
+    </activity>
+
+    <receiver android:name=".BusMessageReceiver">
+      <intent-filter>
+        <action android:name="com.osovskiy.bmwinterface.ACTION_NEW_BUS_MESSAGE"/>
+      </intent-filter>
+    </receiver>
+
+    <meta-data
+      android:name="plugin_author"
+      android:value="Vadim Osovskiy"/>
+  </application>
+
+</manifest>
