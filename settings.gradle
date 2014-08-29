@@ -1,1 +1,1 @@
-include ':core', ':usbSerialForAndroid', ':dummy', ':library'
+include ':core', ':usbSerialForAndroid', ':library', ':steeringwheelcontrols'
