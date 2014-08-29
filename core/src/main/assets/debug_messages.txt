@@ -1,3 +1,13 @@
 # Description/Name:SOURCE_BYTE:DESTINATION_BYTE:PAYLOAD
-Dummy:00:18:DEADBEEF
-Dummy2:9B:C8:BEEFDEAD
+VolumeUp:50:68:3211
+VolumeDown:50:68:3210
+NextPressed:50:68:3B01
+NextHold:50:68:3B11
+NextReleased:50:68:3B21
+PreviousPressed:50:68:3B08
+PreviousHold:50:68:3B18
+PreviousReleased:50:68:3B28
+DialPressed:50:68:3B80
+DialHold:50:68:3B90
+DialReleased:50:68:3BA0
+R/T:50:C8:01
