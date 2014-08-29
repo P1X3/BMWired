@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class DebuggingFragment extends Fragment implements AdapterView.OnItemSelectedListener, View.OnClickListener
 {
-  List<BusMessage> messages = new ArrayList<>();
+  List<DebugBusMessage> messages = new ArrayList<>();
   Messenger messenger;
   ListView listView;
   Button sendToBus, sendFromService;
@@ -57,7 +57,10 @@ public class DebuggingFragment extends Fragment implements AdapterView.OnItemSel
     listView.setAdapter(adapter);
     listView.setOnItemSelectedListener(this);
 
-    messages.add(new BusMessage(BusMessage.BusDevice.Broadcast, BusMessage.BusDevice.CD, new byte[] {}));
+    DebugBusMessage debugBusMessage = new DebugBusMessage(new BusMessage(BusMessage.BusDevice.Broadcast, BusMessage.BusDevice.CD, new byte[] {}));
+    debugBusMessage.setDescription("Dummy");
+
+    messages.add(debugBusMessage);
 
     selectedMsg = messages.get(0);
 
@@ -86,7 +89,9 @@ public class DebuggingFragment extends Fragment implements AdapterView.OnItemSel
         {
           Intent intent = new Intent(Utils.ACTION_SEND_BUS_MESSAGE);
           intent.putExtra(BusMessage.class.getSimpleName(), selectedMsg);
-          getActivity().sendBroadcast(intent, Utils.PERMISSION_SEND_MESSAGE);
+
+          getActivity().sendBroadcast(selectedMsg.getIntent(Utils.ACTION_SEND_BUS_MESSAGE));
+          //getActivity().sendBroadcast(intent, Utils.PERMISSION_SEND_MESSAGE);
           Toast.makeText(getActivity(), "Send to bus using broadcast", Toast.LENGTH_SHORT).show();
         }
         else
@@ -121,13 +126,13 @@ public class DebuggingFragment extends Fragment implements AdapterView.OnItemSel
     }
   }
 
-  private class BusMessageAdapter extends ArrayAdapter<BusMessage>
+  private class BusMessageAdapter extends ArrayAdapter<DebugBusMessage>
   {
     private Context context;
     private int resource;
-    private List<BusMessage> objects;
+    private List<DebugBusMessage> objects;
 
-    public BusMessageAdapter(Context context, int resource, List<BusMessage> objects)
+    public BusMessageAdapter(Context context, int resource, List<DebugBusMessage> objects)
     {
       super(context, resource, objects);
       this.context = context;
@@ -143,6 +148,8 @@ public class DebuggingFragment extends Fragment implements AdapterView.OnItemSel
         LayoutInflater inflater = ((Activity)context).getLayoutInflater();
         convertView = inflater.inflate(resource, parent, false);
       }
+
+      DebugBusMessage debugBusMessage = objects.get(position);
 
       (( TextView)convertView.findViewById(android.R.id.text1)).setText(objects.get(position).toString());
 
