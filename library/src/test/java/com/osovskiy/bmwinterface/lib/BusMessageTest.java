@@ -2,7 +2,6 @@ package com.osovskiy.bmwinterface.lib;
 
 import android.os.Bundle;
 import android.test.AndroidTestCase;
-import android.util.Log;
 
 import java.util.Arrays;
 

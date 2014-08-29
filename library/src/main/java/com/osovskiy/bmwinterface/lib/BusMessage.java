@@ -1,5 +1,6 @@
 package com.osovskiy.bmwinterface.lib;
 
+import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -93,6 +94,13 @@ public class BusMessage implements Parcelable
       checksum^= b;
 
     return checksum;
+  }
+
+  public Intent getIntent(String action)
+  {
+    Intent intent = new Intent(action);
+    intent.putExtra(BusMessage.class.getSimpleName(), this);
+    return intent;
   }
 
   @Override
