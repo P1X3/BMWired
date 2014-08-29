@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
@@ -24,15 +26,19 @@ import com.osovskiy.bmwinterface.R;
 import com.osovskiy.bmwinterface.lib.BusMessage;
 import com.osovskiy.bmwinterface.lib.Utils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Administrator on 8/27/2014.
  */
-public class DebuggingFragment extends Fragment implements AdapterView.OnItemSelectedListener, View.OnClickListener
+public class DebuggingFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemClickListener
 {
   List<DebugBusMessage> messages = new ArrayList<>();
+  BusMessageAdapter adapter;
   Messenger messenger;
   ListView listView;
   Button sendToBus, sendFromService;
@@ -53,30 +59,13 @@ public class DebuggingFragment extends Fragment implements AdapterView.OnItemSel
     sendToBus.setOnClickListener(this);
     sendFromService.setOnClickListener(this);
 
-    BusMessageAdapter adapter = new BusMessageAdapter(getActivity(), android.R.layout.simple_list_item_1, messages);
+    adapter = new BusMessageAdapter(getActivity(), android.R.layout.simple_list_item_1, messages);
     listView.setAdapter(adapter);
-    listView.setOnItemSelectedListener(this);
+    listView.setOnItemClickListener(this);
 
-    DebugBusMessage debugBusMessage = new DebugBusMessage(new BusMessage(BusMessage.BusDevice.Broadcast, BusMessage.BusDevice.CD, new byte[] {}));
-    debugBusMessage.setDescription("Dummy");
-
-    messages.add(debugBusMessage);
-
-    selectedMsg = messages.get(0);
+    new LoadDebugMessages().execute();
 
     return v;
-  }
-
-  @Override
-  public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
-  {
-    selectedMsg = messages.get(position);
-  }
-
-  @Override
-  public void onNothingSelected(AdapterView<?> parent)
-  {
-
   }
 
   @Override
@@ -126,6 +115,12 @@ public class DebuggingFragment extends Fragment implements AdapterView.OnItemSel
     }
   }
 
+  @Override
+  public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+  {
+    selectedMsg = messages.get(position);
+  }
+
   private class BusMessageAdapter extends ArrayAdapter<DebugBusMessage>
   {
     private Context context;
@@ -151,9 +146,54 @@ public class DebuggingFragment extends Fragment implements AdapterView.OnItemSel
 
       DebugBusMessage debugBusMessage = objects.get(position);
 
-      (( TextView)convertView.findViewById(android.R.id.text1)).setText(objects.get(position).toString());
+      (( TextView)convertView.findViewById(android.R.id.text1)).setText(debugBusMessage.toString());
 
       return convertView;
+    }
+  }
+
+  private class LoadDebugMessages extends AsyncTask<Void, Void, Void>
+  {
+
+    @Override
+    protected Void doInBackground(Void... params)
+    {
+      AssetManager assetManager = getActivity().getAssets();
+      try
+      {
+        BufferedReader br = new BufferedReader(new InputStreamReader(assetManager.open("debug_messages.txt")));
+
+        String line;
+        while ((line = br.readLine()) != null)
+        {
+          if (line.startsWith("#"))
+            continue;
+
+          String[] cols = line.split(":");
+
+          BusMessage.BusDevice source = BusMessage.BusDevice.tryParse((byte) (Integer.parseInt(cols[1], 16)));
+          BusMessage.BusDevice destination = BusMessage.BusDevice.tryParse((byte) (Integer.parseInt(cols[2], 16)));
+          byte[] payload = Utils.hexStringToByteArray(cols[3]);
+
+          DebugBusMessage debugBusMessage = new DebugBusMessage(source, destination, payload);
+          debugBusMessage.setDescription(cols[0]);
+
+          messages.add(debugBusMessage);
+        }
+      }
+      catch ( IOException e )
+      {
+        e.printStackTrace();
+      }
+
+      return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid)
+    {
+      super.onPostExecute(aVoid);
+      adapter.notifyDataSetChanged();
     }
   }
 }
