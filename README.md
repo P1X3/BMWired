@@ -1,27 +1,38 @@
 ## About
-BMWinterface is a project for android devices running 4.x+, whose sole purpose is to interface with I-Bus in BMW vehicles.
+BMWinterface is core application that acts as a gateway between BMW K/I-Bus and plugins. Plugins that satisfy requirments listed below can receive and send messages to/from the bus.
+
+## Plugin Implementation
+All plugins must include library module as a dependency for receiving and/or sending messages.
+
+### Receiving
+1. Add permission to AndroidManifest.xml
+```
+<uses-permission android:name="com.osovskiy.bmwinterface.permission.RECEIVE_MSG_PERMISSION" />
+```
+2. Create `BroadcastReceiver` with intent-filter for action `<action android:name="com.osovskiy.bmwinterface.ACTION_NEW_BUS_MESSAGE" />`
+3. In BroadcastReceiver retreive BusMessage from extras using key `BusMessage.class.getSimpleName()`
+```
+public void onReceive(Context context, Intent intent)
+{
+  BusMessage msg = intent.getParcelableExtra(BusMessage.class.getSimpleName());
+  Toast.makeText(context, "New message received: " + msg.toString(), Toast.LENGTH_SHORT).show();
+}
+```
+
+### Sending
+1. Add permission to AndroidManifest.xml
+```
+<uses-permission android:name="com.osovskiy.bmwinterface.permission.SEND_MSG_PERMISSION" />
+```
+2. Create a valid `BusMessage`
+```
+BusMessage msg = new BusMessage(BusMessage.BusDevice.Broadcast, BusMessage.BusDevice.CD, new byte[] { 0x00, 0x0C, (byte)0xFB, 0x01 });
+```
+3. Send broadcast
+```
+sendBroadcast(msg.getIntent(Utils.ACTION_SEND_BUS_MESSAGE), Utils.PERMISSION_SEND_MESSAGE);
+```
 
 ## Building
-Add [usb-serial-for-android](https://github.com/mik3y/usb-serial-for-android) to project dependency list. Build.
+Add [usb-serial-for-android](https://github.com/mik3y/usb-serial-for-android) to project dependency list. Build. (maven coming soon)
 
-## How to use
-1. Install the application
-2. Create desktop widget
-3. Insert USB interface and allow activity to run when notification appears
-
-## Usage notes
-* Widget is not required
-
-## Implemented features
-* Volume Up&Down: Tested
-* Next&Previous: Not tested
-
-## FAQ
-
-**Q:** What interfaces can be used?
-
-**A:** BMWinterface has been designed for [IBUS interface from Rolf Resler](http://www.reslers.de/IBUS/). It may work with other interfaces, but they have to be added to probe list, tested, and then added to release build. 
-
-**Vednor ID:** 0x10C4
-
-**ProductID:** 0x8584
