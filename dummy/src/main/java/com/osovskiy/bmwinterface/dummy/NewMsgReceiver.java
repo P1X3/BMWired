@@ -17,7 +17,7 @@ public class NewMsgReceiver extends BroadcastReceiver
   public void onReceive(Context context, Intent intent)
   {
     Log.d("TAG", intent.getAction());
-    BusMessage msg = intent.getParcelableExtra("msg");
+    BusMessage msg = intent.getParcelableExtra(BusMessage.class.getSimpleName());
     Toast.makeText(context, "New message received: " + msg.toString(), Toast.LENGTH_SHORT).show();
   }
 }
