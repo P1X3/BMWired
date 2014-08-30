@@ -6,19 +6,19 @@
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
   <uses-permission android:name="android.permission.USB_PERMISSION"/>
 
-  <uses-permission android:name="com.osovskiy.bmwinterface.permission.RECEIVE_MSG_PERMISSION" />
-  <uses-permission android:name="com.osovskiy.bmwinterface.permission.SEND_MSG_PERMISSION" />
+  <uses-permission android:name="com.osovskiy.bmwinterface.permission.RECEIVE_MSG" />
+  <uses-permission android:name="com.osovskiy.bmwinterface.permission.SEND_MSG" />
 
   <uses-feature android:name="android.hardware.usb.host"/>
 
   <permission
-    android:name="com.osovskiy.bmwinterface.permission.RECEIVE_MSG_PERMISSION"
+    android:name="com.osovskiy.bmwinterface.permission.RECEIVE_MSG"
     android:description="@string/desc_permission_receive"
     android:label="@string/label_permission_receive"
     android:protectionLevel="normal"/>
 
   <permission
-    android:name="com.osovskiy.bmwinterface.permission.SEND_MSG_PERMISSION"
+    android:name="com.osovskiy.bmwinterface.permission.SEND_MSG"
     android:description="@string/desc_permission_send"
     android:label="@string/label_permission_send"
     android:protectionLevel="normal"/>

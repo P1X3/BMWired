@@ -3,7 +3,7 @@
   package="com.osovskiy.bmwinterface.plugin.steeringwheelcontrols"
   xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <uses-permission android:name="com.osovskiy.bmwinterface.permission.RECEIVE_MSG_PERMISSION"/>
+  <uses-permission android:name="com.osovskiy.bmwinterface.permission.RECEIVE_MSG"/>
 
   <application
     android:allowBackup="true"
