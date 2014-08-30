@@ -3,6 +3,7 @@ BMWinterface is core application that acts as a gateway between BMW K/I-Bus and 
 
 ## Plugin Implementation
 All plugins must include library module as a dependency for receiving and/or sending messages.
+Add ```<meta-data android:name="plugin_author" android:value="John Doe"/>``` to `AndroidManifest.xml`
 
 ### Receiving
 1. Add permission to AndroidManifest.xml

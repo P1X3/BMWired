@@ -8,6 +8,9 @@ import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -33,6 +36,8 @@ public class SetupFragment extends Fragment
   @Override
   public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
   {
+    setHasOptionsMenu(true);
+
     View v = inflater.inflate(R.layout.fragment_setup, container, false);
     ListView lv = (ListView) v.findViewById(R.id.lvDevices);
     adapter = new DriversListAdapter(getActivity(), R.layout.list_driver_item, listDrivers);
@@ -41,6 +46,25 @@ public class SetupFragment extends Fragment
     new LoadUSBDevices().execute();
 
     return v;
+  }
+
+  @Override
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+  {
+    inflater.inflate(R.menu.main_activity_setup, menu);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item)
+  {
+    switch ( item.getItemId() )
+    {
+      case R.id.actions_refresh:
+        new LoadUSBDevices().execute();
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
+    }
   }
 
   private class LoadUSBDevices extends AsyncTask<Void, Void, Void>
@@ -58,7 +82,6 @@ public class SetupFragment extends Fragment
     protected void onPostExecute(Void aVoid)
     {
       adapter.notifyDataSetChanged();
-      Toast.makeText(getActivity(), "Devices list updated. Devices: " + listDrivers.size(), Toast.LENGTH_SHORT).show();
     }
   }
 
