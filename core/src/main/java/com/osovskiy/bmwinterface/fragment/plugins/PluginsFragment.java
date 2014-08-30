@@ -89,10 +89,11 @@ public class PluginsFragment extends ListFragment
 
       for ( ApplicationInfo packageInfo : packages )
       {
-        if ( PackageManager.PERMISSION_GRANTED == pm.checkPermission(Utils.PERMISSION_RECEIVE_MESSAGE, packageInfo.packageName) ||
-            PackageManager.PERMISSION_GRANTED == pm.checkPermission(Utils.PERMISSION_SEND_MESSAGE, packageInfo.packageName) )
+        boolean receiveGranted = (PackageManager.PERMISSION_GRANTED == pm.checkPermission(Utils.PERMISSION_RECEIVE_MESSAGE, packageInfo.packageName));
+        boolean sendGranted = (PackageManager.PERMISSION_GRANTED == pm.checkPermission(Utils.PERMISSION_SEND_MESSAGE, packageInfo.packageName));
+
+        if ( receiveGranted || sendGranted )
         {
-          Log.d("TAG", "Found one");
           Bundle metaData = packageInfo.metaData;
           if ( metaData != null )
           {
@@ -102,7 +103,6 @@ public class PluginsFragment extends ListFragment
           }
         }
       }
-
       return null;
     }
 
@@ -110,7 +110,6 @@ public class PluginsFragment extends ListFragment
     protected void onPostExecute(Void aVoid)
     {
       adapter.notifyDataSetChanged();
-      Toast.makeText(getActivity(), "Plugin list updated. Found: " + pluginsList.size(), Toast.LENGTH_SHORT).show();
     }
   }
 }
