@@ -27,7 +27,6 @@ import java.util.List;
  */
 public class SetupFragment extends Fragment
 {
-  List<String> listDriversString = new ArrayList<>();
   List<UsbSerialDriver> listDrivers = new ArrayList<>();
   DriversListAdapter adapter;
 
@@ -52,12 +51,6 @@ public class SetupFragment extends Fragment
     {
       UsbManager manager = (UsbManager) getActivity().getSystemService(Context.USB_SERVICE);
       listDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager);
-      listDriversString.clear();
-
-      for ( UsbSerialDriver driver : listDrivers )
-      {
-        listDriversString.add(driver.getDevice().getDeviceName());
-      }
       return null;
     }
 
