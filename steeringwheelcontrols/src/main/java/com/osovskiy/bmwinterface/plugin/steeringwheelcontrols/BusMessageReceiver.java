@@ -10,6 +10,8 @@ import com.osovskiy.bmwinterface.lib.BusMessage;
 
 public class BusMessageReceiver extends BroadcastReceiver
 {
+
+
   @Override
   public void onReceive(Context context, Intent intent)
   {
@@ -36,31 +38,27 @@ public class BusMessageReceiver extends BroadcastReceiver
         // Previous/Next/RT/Dial
         case 0x3B:
           Intent mediaIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+          KeyEvent keyEvent = null;
           switch ( payload[1] )
           {
             // Next
             case 0x01: // Press
-
-              mediaIntent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_NEXT));
-              context.sendOrderedBroadcast(intent, null);
+              keyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_NEXT);
               break;
             case 0x11: // Hold
               break;
             case 0x21: // Release
-              mediaIntent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_NEXT));
-              context.sendOrderedBroadcast(intent, null);
+              keyEvent = new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_NEXT);
               break;
 
             // Previous
             case 0x08: // Press
-              mediaIntent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PREVIOUS));
-              context.sendOrderedBroadcast(intent, null);
+              keyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PREVIOUS);
               break;
             case 0x18: // Hold
               break;
             case 0x28: // Release
-              mediaIntent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PREVIOUS));
-              context.sendOrderedBroadcast(intent, null);
+              keyEvent = new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PREVIOUS);
               break;
 
             // Dial
@@ -70,6 +68,11 @@ public class BusMessageReceiver extends BroadcastReceiver
               break;
             case (byte) 0xA0: // Release
               break;
+          }
+          if ( keyEvent != null )
+          {
+            mediaIntent.putExtra(Intent.EXTRA_KEY_EVENT, keyEvent);
+            context.sendBroadcast(mediaIntent);
           }
           break;
       }
