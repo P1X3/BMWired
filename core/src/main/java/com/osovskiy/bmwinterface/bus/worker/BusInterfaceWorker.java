@@ -65,7 +65,7 @@ public abstract class BusInterfaceWorker extends Thread
     }
   }
 
-  private void fireWorkerClosing()
+  private void fireWorkerClosing(final BusInterface.EventListener.ClosingReason closingReason)
   {
     if ( eventListener != null && outputHandler != null )
     {
@@ -74,7 +74,7 @@ public abstract class BusInterfaceWorker extends Thread
         @Override
         public void run()
         {
-          eventListener.workerClosing();
+          eventListener.workerClosing(closingReason);
         }
       });
     }
@@ -111,10 +111,11 @@ public abstract class BusInterfaceWorker extends Thread
       }
 
       close();
-      fireWorkerClosing();
+      fireWorkerClosing(BusInterface.EventListener.ClosingReason.Normal);
     }
     catch ( Exception e )
     {
+      fireWorkerClosing(BusInterface.EventListener.ClosingReason.NonRecoverableError);
       e.printStackTrace();
     }
   }

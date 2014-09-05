@@ -10,8 +10,6 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.hoho.android.usbserial.driver.Cp21xxSerialDriver;
-import com.hoho.android.usbserial.driver.ProbeTable;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
@@ -28,16 +26,12 @@ import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * Created by Administrator on 8/1/2014.
- */
 public class BusInterface
 {
   private static final String TAG = BusInterface.class.getSimpleName();
 
   private Context context;
 
-  private ProbeTable usbProbeTable;
   private BusInterfaceWorker workerThread;
   private EventListener eventListener;
   private BlockingQueue<BusMessage> queue = new LinkedBlockingQueue<>();
@@ -48,9 +42,6 @@ public class BusInterface
   {
     Log.d(TAG, "Creating BusInterface");
     this.context = context;
-
-    usbProbeTable = new ProbeTable();
-    usbProbeTable.addProduct(0x10C4, 0x8584, Cp21xxSerialDriver.class);
 
     eventListener = el;
 
@@ -175,7 +166,14 @@ public class BusInterface
   {
     void newMessage(BusMessage message);
     void newSync(boolean sync);
-    void workerClosing();
+    void workerClosing(ClosingReason reason);
+
+    public enum ClosingReason
+    {
+      ConnectionLost,
+      NonRecoverableError,
+      Normal
+    }
   }
 
   public enum Type

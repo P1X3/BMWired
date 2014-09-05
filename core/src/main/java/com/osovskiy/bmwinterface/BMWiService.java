@@ -47,9 +47,9 @@ public class BMWiService extends Service
     }
 
     @Override
-    public void workerClosing()
+    public void workerClosing(ClosingReason closingReason)
     {
-
+      Log.d(TAG, "Worker closed " + closingReason.toString());
     }
   };
   private final Messenger messenger = new Messenger(new IncomingHandler());
