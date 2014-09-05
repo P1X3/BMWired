@@ -1,9 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-  <CheckBoxPreference
-    android:defaultValue="false"
-    android:key="bluetooth_interface"
-    android:summary="Use bluetooth interface instead of serial"
-    android:title="Bluetooth Interface"/>
+  <PreferenceCategory android:title="Bluetooth">
+    <CheckBoxPreference
+      android:defaultValue="false"
+      android:key="bluetooth_interface"
+      android:summary="Use bluetooth interface instead of serial"
+      android:title="Enable"/>
+    <EditTextPreference
+      android:defaultValue="00:14:01:02:30:79"
+      android:key="bluetooth_mac"
+      android:summary="MAC address of bluetooth interface"
+      android:title="MAC"/>
+    <EditTextPreference
+      android:defaultValue="5"
+      android:key="bluetooth_attempts"
+      android:summary="Number of connection attempts to make"
+      android:title="Connection attempts"
+      android:inputType="number"/>
+    <EditTextPreference
+      android:defaultValue="2"
+      android:key="bluetooth_delay"
+      android:summary="Delay, in seconds, between connection attempts"
+      android:title="Delay"
+      android:inputType="number"/>
+  </PreferenceCategory>
+
 </PreferenceScreen>
