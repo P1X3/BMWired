@@ -6,7 +6,6 @@ import android.util.Log;
 import com.osovskiy.bmwinterface.bus.BusInterface;
 import com.osovskiy.bmwinterface.lib.BusMessage;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.BlockingQueue;
 
@@ -66,10 +65,37 @@ public abstract class BusInterfaceWorker extends Thread
     }
   }
 
+  private void fireWorkerClosing()
+  {
+    if ( eventListener != null && outputHandler != null )
+    {
+      outputHandler.post(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          eventListener.workerClosing();
+        }
+      });
+    }
+  }
+
+  /**
+   * Implementation to read data from interface
+   * @throws Exception
+   */
   public abstract void read() throws Exception;
 
+  /**
+   * Implementation to write pending BusMessages
+   * @throws Exception
+   */
   public abstract void write() throws Exception;
 
+  /**
+   * Implementation to close and release any used resources
+   * @throws Exception
+   */
   public abstract void close() throws Exception;
 
   @Override
@@ -85,6 +111,7 @@ public abstract class BusInterfaceWorker extends Thread
       }
 
       close();
+      fireWorkerClosing();
     }
     catch ( Exception e )
     {
@@ -92,6 +119,11 @@ public abstract class BusInterfaceWorker extends Thread
     }
   }
 
+  /**
+   * Append data to the buffer
+   * @param data Buffer with data to be appended
+   * @param size Amount of data in buffer
+   */
   protected void append(byte[] data, int size)
   {
     for ( int i = 0; i < size; i++ )
