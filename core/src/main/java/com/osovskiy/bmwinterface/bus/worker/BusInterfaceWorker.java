@@ -1,35 +1,31 @@
-package com.osovskiy.bmwinterface;
+package com.osovskiy.bmwinterface.bus.worker;
 
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
-import com.hoho.android.usbserial.driver.UsbSerialPort;
+import com.osovskiy.bmwinterface.bus.BusInterface;
 import com.osovskiy.bmwinterface.lib.BusMessage;
 
 import java.io.IOException;
-import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.BlockingQueue;
 
-public class BusInterfaceWorker extends Thread
+public abstract class BusInterfaceWorker extends Thread
 {
   public static final int MSG_NEW_SYNC_STATE = 0;
   public static final int MSG_NEW_MESSAGE = 1;
   private static final int MSG_MIN_SIZE = 5;
   private final String TAG = this.getClass().getSimpleName();
 
-  private UsbSerialPort port;
   private byte[] buffer;
   private int tail, head;
   private Handler outputHandler;
   private BusInterface.EventListener eventListener;
-  private BlockingQueue<BusMessage> queue;
+  protected BlockingQueue<BusMessage> queue;
 
-  public BusInterfaceWorker(UsbSerialPort port, Handler handler, BusInterface.EventListener el, BlockingQueue<BusMessage> queue)
+  public BusInterfaceWorker(Handler handler, BusInterface.EventListener el, BlockingQueue<BusMessage> queue)
   {
     Log.d(TAG, "Creating WorkerThread");
-    this.port = port;
     this.outputHandler = handler;
     this.eventListener = el;
     this.queue = queue;
@@ -70,52 +66,38 @@ public class BusInterfaceWorker extends Thread
     }
   }
 
+  public abstract void read() throws Exception;
+
+  public abstract void write() throws Exception;
+
+  public abstract void close() throws Exception;
+
   @Override
   public void run()
   {
     try
     {
-      byte[] readBuffer = new byte[2048];
       while ( !Thread.currentThread().isInterrupted() )
       {
-        int bytesRead = port.read(readBuffer, 100);
-
-        if ( bytesRead > ( buffer.length - size() ) )
-          throw new BufferOverflowException();
-
-        for ( int i = 0; i < bytesRead; i++ )
-        {
-          buffer[head] = readBuffer[i];
-          head = ( head + 1 ) % buffer.length;
-        }
-
+        read();
         process();
-
-        while ( queue.size() > 0 )
-        {
-          BusMessage msg = queue.take();
-          port.write(msg.build(), 0);
-        }
+        write();
       }
-    }
-    catch ( IOException e )
-    {
 
+      close();
     }
-    catch ( InterruptedException e )
+    catch ( Exception e )
     {
       e.printStackTrace();
     }
-    finally
+  }
+
+  protected void append(byte[] data, int size)
+  {
+    for ( int i = 0; i < size; i++ )
     {
-      try
-      {
-        port.close();
-      }
-      catch ( IOException e )
-      {
-        e.printStackTrace();
-      }
+      buffer[head] = data[i];
+      head = ( head + 1 ) % buffer.length;
     }
   }
 

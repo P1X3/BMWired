@@ -41,7 +41,7 @@ public class DebuggingFragment extends Fragment implements View.OnClickListener,
   BusMessageAdapter adapter;
   Messenger messenger;
   ListView listView;
-  Button sendToBus, sendFromService;
+  Button sendToBus, sendFromService, sendOpenBusInterface, sendCloseBusInterface;
   CheckBox sendBroadcast;
 
   BusMessage selectedMsg;
@@ -55,9 +55,13 @@ public class DebuggingFragment extends Fragment implements View.OnClickListener,
     sendToBus = (Button)v.findViewById(R.id.buttonSendToBus);
     sendFromService = (Button)v.findViewById(R.id.buttonSendFromService);
     sendBroadcast = (CheckBox)v.findViewById(R.id.checkboxBroadcast);
+    sendOpenBusInterface = (Button)v.findViewById(R.id.buttonSendOpenBusInterface);
+    sendCloseBusInterface = (Button)v.findViewById(R.id.buttonSendCloseBusInterface);
 
     sendToBus.setOnClickListener(this);
     sendFromService.setOnClickListener(this);
+    sendOpenBusInterface.setOnClickListener(this);
+    sendCloseBusInterface.setOnClickListener(this);
 
     adapter = new BusMessageAdapter(getActivity(), android.R.layout.simple_list_item_1, messages);
     listView.setAdapter(adapter);
@@ -111,6 +115,26 @@ public class DebuggingFragment extends Fragment implements View.OnClickListener,
         }
 
         Toast.makeText(getActivity(), "Send from service", Toast.LENGTH_SHORT).show();
+        break;
+      case R.id.buttonSendOpenBusInterface:
+        try
+        {
+          messenger.send(Message.obtain(null, BMWiService.MSG_BUSINTERFACE_OPEN));
+        }
+        catch ( RemoteException e )
+        {
+          e.printStackTrace();
+        }
+        break;
+      case R.id.buttonSendCloseBusInterface:
+        try
+        {
+          messenger.send(Message.obtain(null, BMWiService.MSG_BUSINTERFACE_CLOSE));
+        }
+        catch ( RemoteException e )
+        {
+          e.printStackTrace();
+        }
         break;
     }
   }

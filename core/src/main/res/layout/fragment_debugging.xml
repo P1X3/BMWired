@@ -30,4 +30,18 @@
     android:id="@+id/buttonSendFromService"
     android:text="Send from service"
     android:layout_below="@id/buttonSendToBus"/>
+
+  <Button
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/buttonSendOpenBusInterface"
+    android:text="Open bus interface"
+    android:layout_below="@id/buttonSendFromService"/>
+
+  <Button
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/buttonSendCloseBusInterface"
+    android:text="Close bus interface"
+    android:layout_below="@id/buttonSendOpenBusInterface"/>
 </RelativeLayout>

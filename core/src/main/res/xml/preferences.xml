@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
   <CheckBoxPreference
-    android:key="checkbox_test"
-    android:summary="Summary haha test dummy lol"
-    android:title="Title"/>
+    android:defaultValue="false"
+    android:key="bluetooth_interface"
+    android:summary="Use bluetooth interface instead of serial"
+    android:title="Bluetooth Interface"/>
 </PreferenceScreen>

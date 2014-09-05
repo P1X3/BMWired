@@ -5,13 +5,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.osovskiy.bmwinterface.bus.BusInterface;
 import com.osovskiy.bmwinterface.lib.BusMessage;
 import com.osovskiy.bmwinterface.lib.Utils;
 
@@ -23,6 +27,8 @@ public class BMWiService extends Service
   public static final int MSG_UNREGISTER_CLIENT = 1;
   public static final int MSG_SENDTO_BUS = 2;
   public static final int MSG_SENDFROM_BUS = 3;
+  public static final int MSG_BUSINTERFACE_OPEN = 4;
+  public static final int MSG_BUSINTERFACE_CLOSE = 5;
   private final String TAG = this.getClass().getSimpleName();
   private final BusInterface.EventListener eventListener = new BusInterface.EventListener()
   {
@@ -61,6 +67,7 @@ public class BMWiService extends Service
     }
   };
   private BusInterface busInterface;
+  private SharedPreferences prefs;
 
   public BMWiService()
   {
@@ -80,7 +87,7 @@ public class BMWiService extends Service
     Log.d(TAG, "onCreate");
 
     busInterface = new BusInterface(getApplicationContext(), new Handler(), eventListener);
-
+    prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
     IntentFilter intentFilter = new IntentFilter();
     intentFilter.addAction(Utils.ACTION_SEND_BUS_MESSAGE);
     registerReceiver(receiver, intentFilter, Utils.PERMISSION_SEND_MESSAGE, null);
@@ -104,16 +111,20 @@ public class BMWiService extends Service
   public int onStartCommand(Intent intent, int flags, int startId)
   {
     Log.d(TAG, "onStartCommand");
-    if ( intent.getAction() != null )
+    if (intent != null)
     {
-      Log.d(TAG, "Action: " + intent.getAction());
-      if ( intent.getAction().equals(ACTION_STOP_SERVICE) )
+      String action = intent.getAction();
+      if ( action != null )
       {
-        stopSelf();
+        Log.d(TAG, "Action: " + action);
+        if ( action.equals(ACTION_STOP_SERVICE) )
+        {
+          stopSelf();
+        }
       }
     }
 
-    busInterface.tryOpen();
+    busInterface.tryOpen((prefs.getBoolean("bluetooth_interface", false)) ? BusInterface.Type.BLUETOOTH : BusInterface.Type.SERIAL);
 
     return START_STICKY;
   }
@@ -126,6 +137,7 @@ public class BMWiService extends Service
     @Override
     public void handleMessage(Message msg)
     {
+      Log.d(TAG, String.valueOf(msg.what));
       switch ( msg.what )
       {
         case MSG_REGISTER_CLIENT:
@@ -141,6 +153,15 @@ public class BMWiService extends Service
         case MSG_SENDFROM_BUS:
           msg.getData().setClassLoader(BusMessage.class.getClassLoader());
           eventListener.newMessage((BusMessage) msg.getData().getParcelable(BusMessage.class.getSimpleName()));
+          break;
+        case MSG_BUSINTERFACE_OPEN:
+          if (busInterface == null)
+            busInterface = new BusInterface(getApplicationContext(), new Handler(), eventListener);
+          busInterface.tryOpen((prefs.getBoolean("bluetooth_interface", false)) ? BusInterface.Type.BLUETOOTH : BusInterface.Type.SERIAL);
+          break;
+        case MSG_BUSINTERFACE_CLOSE:
+          busInterface.destroy();
+          busInterface = null;
           break;
         default:
           super.handleMessage(msg);
