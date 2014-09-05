@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+  <PreferenceCategory android:title="Serial">
+    <EditTextPreference
+      android:key="serial_name"
+      android:summary="Name of the selected driver"
+      android:title="Driver name"/>
+    <EditTextPreference
+      android:key="serial_port"
+      android:summary="Port number to use for connection"
+      android:title="Port"
+      android:inputType="number"/>
+  </PreferenceCategory>
   <PreferenceCategory android:title="Bluetooth">
     <CheckBoxPreference
       android:defaultValue="false"
@@ -25,5 +36,4 @@
       android:title="Delay"
       android:inputType="number"/>
   </PreferenceCategory>
-
 </PreferenceScreen>

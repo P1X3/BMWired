@@ -2,10 +2,12 @@ package com.osovskiy.bmwinterface.bus;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.hoho.android.usbserial.driver.Cp21xxSerialDriver;
@@ -40,6 +42,7 @@ public class BusInterface
   private EventListener eventListener;
   private BlockingQueue<BusMessage> queue = new LinkedBlockingQueue<>();
   private AsyncTask<Void, String, BluetoothSocketWrapper> bluetoothConnectTask;
+  private State state;
 
   public BusInterface(Context context, Handler handler, EventListener el)
   {
@@ -50,6 +53,8 @@ public class BusInterface
     usbProbeTable.addProduct(0x10C4, 0x8584, Cp21xxSerialDriver.class);
 
     eventListener = el;
+
+    state = State.DISCONNECTED;
   }
 
   public void destroy()
@@ -59,8 +64,8 @@ public class BusInterface
       workerThread.interrupt();
     workerThread = null;
 
-    if (bluetoothConnectTask != null)
-      bluetoothConnectTask.cancel(true);
+    if ( bluetoothConnectTask != null )
+      bluetoothConnectTask.cancel(true); // TODO: Does not work
     bluetoothConnectTask = null;
   }
 
@@ -74,77 +79,89 @@ public class BusInterface
         return Type.SERIAL;
     }
 
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
     switch ( type )
     {
       case BLUETOOTH:
       {
-        Log.d(TAG, "Attempting to open bluetooth device");
-        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        final BluetoothConnector connector = new BluetoothConnector(adapter, adapter.getRemoteDevice("00:14:01:02:30:79"), UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
+        String selectedBluetooth = preferences.getString("bluetooth_mac", null);
 
-        bluetoothConnectTask = new AsyncTask<Void, String, BluetoothSocketWrapper>()
+        if (selectedBluetooth != null)
         {
-          @Override
-          protected BluetoothSocketWrapper doInBackground(Void... params)
+          Log.d(TAG, "Attempting to open bluetooth device " + selectedBluetooth);
+          BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+          final BluetoothConnector connector = new BluetoothConnector(adapter, adapter.getRemoteDevice(selectedBluetooth), UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
+
+          bluetoothConnectTask = new AsyncTask<Void, String, BluetoothSocketWrapper>()
           {
-            BluetoothSocketWrapper socket;
-            while ((socket = connector.connect()) == null && !isCancelled())
+            @Override
+            protected BluetoothSocketWrapper doInBackground(Void... params)
+            {
+              BluetoothSocketWrapper socket;
+              while ( ( socket = connector.connect() ) == null && !isCancelled() )
+              {
+                try
+                {
+                  Thread.currentThread().sleep(2 * 1000);
+                }
+                catch ( InterruptedException e )
+                {
+                  e.printStackTrace();
+                }
+              }
+              return socket;
+            }
+
+            @Override
+            protected void onPostExecute(BluetoothSocketWrapper socket)
+            {
+              if ( !isCancelled() )
+                workerThread = new BluetoothBusInterfaceWorker(socket, new Handler(), eventListener, queue);
+            }
+          };
+          bluetoothConnectTask.execute();
+        }
+      }
+      break;
+      case SERIAL:
+      {
+        String selectedDevice = preferences.getString("serial_name", null);
+        int selectedPort = Integer.valueOf(preferences.getString("serial_port", "0"));
+
+        Log.d(TAG, "Opening " + selectedDevice + ", port " + selectedPort);
+
+        if ( selectedDevice != null )
+        {
+          UsbManager manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+          List<UsbSerialDriver> availableDriver = UsbSerialProber.getDefaultProber().findAllDrivers(manager);
+
+          for ( UsbSerialDriver driver : availableDriver )
+          {
+            if ( driver.getDevice().equals(selectedDevice) )
             {
               try
               {
-                Thread.currentThread().sleep(2*1000);
+                UsbDeviceConnection connection = manager.openDevice(driver.getDevice());
+                UsbSerialPort serialPort = driver.getPorts().get(selectedPort);
+
+                if ( serialPort == null )
+                  throw new IOException();
+
+                serialPort.open(connection);
+                serialPort.setParameters(9600, 8, 1, UsbSerialPort.PARITY_EVEN);
+
+                workerThread = new SerialBusInterfaceWorker(serialPort, new Handler(), eventListener, queue);
               }
-              catch ( InterruptedException e )
+              catch ( IOException e )
               {
                 e.printStackTrace();
               }
             }
-            return socket;
           }
-
-          @Override
-          protected void onPostExecute(BluetoothSocketWrapper socket)
-          {
-            if (!isCancelled())
-              workerThread = new BluetoothBusInterfaceWorker(socket, new Handler(), eventListener, queue);
-          }
-        };
-        bluetoothConnectTask.execute();
-      } break;
-      case SERIAL:
-      {
-        Log.d(TAG, "Attempting to open serial device");
-        UsbSerialProber prober = new UsbSerialProber(usbProbeTable);
-        UsbManager manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
-
-        List<UsbSerialDriver> availableDrivers = prober.findAllDrivers(manager);
-        Log.d(TAG, "Serial devices available: " + availableDrivers.size());
-        if ( availableDrivers.size() > 0 )
-        {
-          UsbSerialPort serialPort;
-          try
-          {
-            UsbSerialDriver driver = availableDrivers.get(0);
-            Log.d(TAG, "Opening device " + driver.getDevice().getDeviceName());
-
-            UsbDeviceConnection connection = manager.openDevice(driver.getDevice());
-            serialPort = driver.getPorts().get(0);
-
-            if ( serialPort == null )
-              throw new IOException();
-
-            serialPort.open(connection);
-            serialPort.setParameters(9600, 8, 1, UsbSerialPort.PARITY_EVEN);
-          }
-          catch ( IOException e )
-          {
-            Log.d(TAG, e.getMessage());
-            return null;
-          }
-          Log.d(TAG, "Starting serial worker thread");
-          workerThread = new SerialBusInterfaceWorker(serialPort, new Handler(), eventListener, queue);
         }
-      } break;
+      }
+      break;
     }
     return null;
   }
@@ -165,5 +182,11 @@ public class BusInterface
   {
     SERIAL,
     BLUETOOTH
+  }
+
+  public enum State
+  {
+    CONNECTED,
+    DISCONNECTED
   }
 }

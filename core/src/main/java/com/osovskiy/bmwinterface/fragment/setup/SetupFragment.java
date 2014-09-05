@@ -3,20 +3,22 @@ package com.osovskiy.bmwinterface.fragment.setup;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
@@ -28,7 +30,7 @@ import java.util.List;
 /**
  * Created by Administrator on 8/22/2014.
  */
-public class SetupFragment extends Fragment
+public class SetupFragment extends Fragment implements AdapterView.OnItemClickListener
 {
   List<UsbSerialDriver> listDrivers = new ArrayList<>();
   DriversListAdapter adapter;
@@ -42,6 +44,7 @@ public class SetupFragment extends Fragment
     ListView lv = (ListView) v.findViewById(R.id.lvDevices);
     adapter = new DriversListAdapter(getActivity(), R.layout.list_driver_item, listDrivers);
     lv.setAdapter(adapter);
+    lv.setOnItemClickListener(this);
 
     new LoadUSBDevices().execute();
 
@@ -65,6 +68,15 @@ public class SetupFragment extends Fragment
       default:
         return super.onOptionsItemSelected(item);
     }
+  }
+
+  @Override
+  public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+  {
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+    UsbSerialDriver selectedDriver = listDrivers.get(position);
+    preferences.edit().putString("serial_name", selectedDriver.getDevice().getDeviceName());
   }
 
   private class LoadUSBDevices extends AsyncTask<Void, Void, Void>
