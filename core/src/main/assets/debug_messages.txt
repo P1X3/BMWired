@@ -11,3 +11,6 @@ DialPressed:50:68:3B80
 DialHold:50:68:3B90
 DialReleased:50:68:3BA0
 R/T:50:C8:01
+LockToggle:3F:00:0C0301
+OpenTrunk:3F:00:0C0201
+ReqMileage:BF:80:16
