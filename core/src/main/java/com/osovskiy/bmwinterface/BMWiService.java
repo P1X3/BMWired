@@ -45,6 +45,12 @@ public class BMWiService extends Service
     {
       Log.d(TAG, "New sync state: " + sync);
     }
+
+    @Override
+    public void workerClosing()
+    {
+
+    }
   };
   private final Messenger messenger = new Messenger(new IncomingHandler());
   private final BroadcastReceiver receiver = new BroadcastReceiver()

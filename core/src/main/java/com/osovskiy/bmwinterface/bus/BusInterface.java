@@ -174,8 +174,8 @@ public class BusInterface
   public interface EventListener
   {
     void newMessage(BusMessage message);
-
     void newSync(boolean sync);
+    void workerClosing();
   }
 
   public enum Type
