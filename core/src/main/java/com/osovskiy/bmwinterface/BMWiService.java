@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -137,7 +136,6 @@ public class BMWiService extends Service
     @Override
     public void handleMessage(Message msg)
     {
-      Log.d(TAG, String.valueOf(msg.what));
       switch ( msg.what )
       {
         case MSG_REGISTER_CLIENT:
@@ -160,7 +158,8 @@ public class BMWiService extends Service
           busInterface.tryOpen((prefs.getBoolean("bluetooth_interface", false)) ? BusInterface.Type.BLUETOOTH : BusInterface.Type.SERIAL);
           break;
         case MSG_BUSINTERFACE_CLOSE:
-          busInterface.destroy();
+          if (busInterface != null)
+            busInterface.destroy();
           busInterface = null;
           break;
         default:
