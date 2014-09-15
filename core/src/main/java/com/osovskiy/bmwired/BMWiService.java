@@ -9,17 +9,23 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.Messenger;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.osovskiy.bmwired.bus.BusInterface;
 import com.osovskiy.bmwired.lib.BusMessage;
+import com.osovskiy.bmwired.lib.IBMWiService;
+import com.osovskiy.bmwired.lib.IBMWiServiceCallback;
 import com.osovskiy.bmwired.lib.Utils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BMWiService extends Service
 {
+  private List<IBMWiServiceCallback> callbacks = new ArrayList<>();
   public static final String ACTION_STOP_SERVICE = "BMWiService.ACTION_STOP_SERVICE";
   public static final String EVENT_USB_DEVICE_ATTACHED = "BMWiService.EVENT_USB_DEVICE_ATTACHED";
   public static final int MSG_REGISTER_CLIENT = 0;
@@ -38,6 +44,16 @@ public class BMWiService extends Service
       Intent intent = new Intent(Utils.ACTION_NEW_BUS_MESSAGE);
       intent.putExtra(BusMessage.class.getSimpleName(), message);
       sendBroadcast(intent);
+
+      try
+      {
+        for ( IBMWiServiceCallback callback : callbacks )
+          callback.newMessageFromBus(message);
+      }
+      catch ( RemoteException e )
+      {
+        e.printStackTrace();
+      }
     }
 
     @Override
@@ -52,7 +68,33 @@ public class BMWiService extends Service
       Log.d(TAG, "Worker closed " + closingReason.toString());
     }
   };
-  private final Messenger messenger = new Messenger(new IncomingHandler());
+
+  private final IBMWiService.Stub mBinder = new IBMWiService.Stub()
+  {
+    @Override
+    public void sendMessageToBus(BusMessage msg) throws RemoteException
+    {
+      busInterface.sendMsg(msg);
+    }
+
+    @Override
+    public void sendMessageFromBus(BusMessage msg) throws RemoteException
+    {
+      //TODO: Broadcast new message from bus
+    }
+
+    @Override
+    public void registerCallback(IBMWiServiceCallback callback) throws RemoteException
+    {
+      callbacks.add(callback);
+    }
+
+    @Override
+    public void unregisterCallback(IBMWiServiceCallback callback) throws RemoteException
+    {
+      callbacks.remove(callback);
+    }
+  };
   private final BroadcastReceiver receiver = new BroadcastReceiver()
   {
     @Override
@@ -83,7 +125,7 @@ public class BMWiService extends Service
   public IBinder onBind(Intent intent)
   {
     Log.d(TAG, "onBind");
-    return messenger.getBinder();
+    return mBinder;
   }
 
   @Override
@@ -116,7 +158,7 @@ public class BMWiService extends Service
   public int onStartCommand(Intent intent, int flags, int startId)
   {
     Log.d(TAG, "onStartCommand");
-    if (intent != null)
+    if ( intent != null )
     {
       String action = intent.getAction();
       if ( action != null )
@@ -129,7 +171,7 @@ public class BMWiService extends Service
       }
     }
 
-    busInterface.tryOpen((prefs.getBoolean(getString(R.string.preference_key_bluetooth_interface), false)) ? BusInterface.Type.BLUETOOTH : BusInterface.Type.SERIAL);
+    busInterface.tryOpen(( prefs.getBoolean(getString(R.string.preference_key_bluetooth_interface), false) ) ? BusInterface.Type.BLUETOOTH : BusInterface.Type.SERIAL);
 
     return START_STICKY;
   }
@@ -159,12 +201,12 @@ public class BMWiService extends Service
           eventListener.newMessage((BusMessage) msg.getData().getParcelable(BusMessage.class.getSimpleName()));
           break;
         case MSG_BUSINTERFACE_OPEN:
-          if (busInterface == null)
+          if ( busInterface == null )
             busInterface = new BusInterface(getApplicationContext(), new Handler(), eventListener);
-          busInterface.tryOpen((prefs.getBoolean(getString(R.string.preference_key_bluetooth_interface), false)) ? BusInterface.Type.BLUETOOTH : BusInterface.Type.SERIAL);
+          busInterface.tryOpen(( prefs.getBoolean(getString(R.string.preference_key_bluetooth_interface), false) ) ? BusInterface.Type.BLUETOOTH : BusInterface.Type.SERIAL);
           break;
         case MSG_BUSINTERFACE_CLOSE:
-          if (busInterface != null)
+          if ( busInterface != null )
             busInterface.destroy();
           busInterface = null;
           break;
