@@ -74,6 +74,7 @@ public class BMWiService extends Service
     @Override
     public void sendMessageToBus(BusMessage msg) throws RemoteException
     {
+      Log.d(TAG, "Sending to bus: " + msg.toString());
       busInterface.sendMsg(msg);
     }
 
@@ -81,17 +82,21 @@ public class BMWiService extends Service
     public void sendMessageFromBus(BusMessage msg) throws RemoteException
     {
       //TODO: Broadcast new message from bus
+      Log.d(TAG, "Sending from bus: " + msg.toString());
+      eventListener.newMessage(msg);
     }
 
     @Override
     public void registerCallback(IBMWiServiceCallback callback) throws RemoteException
     {
+      Log.d(TAG, "Registering callback");
       callbacks.add(callback);
     }
 
     @Override
     public void unregisterCallback(IBMWiServiceCallback callback) throws RemoteException
     {
+      Log.d(TAG, "Unregistering callback");
       callbacks.remove(callback);
     }
   };
