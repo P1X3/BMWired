@@ -50,31 +50,72 @@ public class DebuggingFragment extends Fragment implements View.OnClickListener,
   private IBMWiServiceCallback.Stub serviceCallback = new IBMWiServiceCallback.Stub()
   {
     @Override
-    public void newMessageFromBus(BusMessage msg) throws RemoteException
+    public void newMessageFromBus(final BusMessage msg) throws RemoteException
     {
       // TODO: Handle new message received from the bus, hop the thread!!!
+      getActivity().runOnUiThread(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          Log.d(TAG, "Received msg: " + msg.toString());
+        }
+      });
+    }
+
+    @Override
+    public void onInterfaceOpen(final String type) throws RemoteException
+    {
+      getActivity().runOnUiThread(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          Log.d(TAG, "Interface open: " + type);
+          Toast.makeText(getActivity(), "Interface open: " + type, Toast.LENGTH_SHORT).show();
+        }
+      });
+    }
+
+    @Override
+    public void onInterfaceClosed(final String reason) throws RemoteException
+    {
+      getActivity().runOnUiThread(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          Log.d(TAG, "Interface closed: " + reason);
+          Toast.makeText(getActivity(), "Interface closed: " + reason, Toast.LENGTH_SHORT).show();
+        }
+      });
     }
   };
 
   @Override
-  public void onStart()
+  public void onActivityCreated(Bundle savedInstanceState)
   {
-    super.onStart();
-    getActivity().bindService(new Intent(getActivity(), IBMWiService.class), serviceConnection, 0);
+    super.onActivityCreated(savedInstanceState);
+    Intent intent = new Intent();
+    intent.setClassName("com.osovskiy.bmwired", "com.osovskiy.bmwired.BMWiService");
+    getActivity().bindService(intent, serviceConnection, 0);
   }
 
   @Override
-  public void onStop()
+  public void onDestroy()
   {
     try
     {
-      service.unregisterCallback(serviceCallback);
+      if (service != null)
+        service.unregisterCallback(serviceCallback);
     }
     catch ( RemoteException e )
     {
       e.printStackTrace();
     }
     getActivity().unbindService(serviceConnection);
+
+    super.onDestroy();
   }
 
   private ServiceConnection serviceConnection = new ServiceConnection()
@@ -140,7 +181,6 @@ public class DebuggingFragment extends Fragment implements View.OnClickListener,
 
           getActivity().sendBroadcast(selectedMsg.getIntent(Utils.ACTION_SEND_BUS_MESSAGE));
           //getActivity().sendBroadcast(intent, Utils.PERMISSION_SEND_MESSAGE);
-          Toast.makeText(getActivity(), "Send to bus using broadcast", Toast.LENGTH_SHORT).show();
         }
         else
         {
@@ -152,7 +192,6 @@ public class DebuggingFragment extends Fragment implements View.OnClickListener,
           {
             e.printStackTrace();
           }
-          Toast.makeText(getActivity(), "Send to bus using bind", Toast.LENGTH_SHORT).show();
         }
         break;
       case R.id.buttonSendFromService:
@@ -164,8 +203,6 @@ public class DebuggingFragment extends Fragment implements View.OnClickListener,
         {
           e.printStackTrace();
         }
-
-        Toast.makeText(getActivity(), "Send from service", Toast.LENGTH_SHORT).show();
         break;
     }
   }
