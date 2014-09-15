@@ -23,7 +23,7 @@ public class FallbackBluetoothSocket extends NativeBluetoothSocket
       Class<?>[] paramTypes = new Class<?>[]{ Integer.TYPE };
 
       Method m = cls.getMethod("createRfcommSocket", paramTypes);
-      Object[] params = new Object[]{ Integer.valueOf(1) };
+      Object[] params = new Object[]{ 1 };
       fallbackSocket = (BluetoothSocket) m.invoke(temp.getRemoteDevice(), params);
     }
     catch ( Exception e )
