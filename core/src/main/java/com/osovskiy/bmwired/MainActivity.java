@@ -8,6 +8,7 @@ import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
@@ -23,12 +24,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Created by Administrator on 8/22/2014.
- */
 public class MainActivity extends Activity implements ActionBar.TabListener
 {
-  private Map<String, Class<? extends Fragment>> fragments = new LinkedHashMap<>();
+  private static final String TAG = MainActivity.class.getSimpleName();
+  private Map<Integer, Class<? extends Fragment>> fragments = new LinkedHashMap<>();
 
   private boolean serviceBound = false;
   private Messenger serviceMessenger = null;
@@ -38,6 +37,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener
     @Override
     public void onServiceConnected(ComponentName name, IBinder service)
     {
+      Log.d(TAG, "Connected to the service");
       serviceMessenger = new Messenger(service);
       serviceBound = true;
     }
@@ -45,6 +45,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener
     @Override
     public void onServiceDisconnected(ComponentName name)
     {
+      Log.d(TAG, "Disconnected from the service");
       serviceMessenger = null;
       serviceBound = false;
     }
@@ -52,10 +53,10 @@ public class MainActivity extends Activity implements ActionBar.TabListener
 
   public MainActivity()
   {
-    fragments.put("Plugins", PluginsFragment.class);
-    fragments.put("Preferences", PreferencesFragment.class);
-    fragments.put("Setup", SetupFragment.class);
-    fragments.put("Debugging", DebuggingFragment.class);
+    fragments.put(R.string.tab_plugins, PluginsFragment.class);
+    fragments.put(R.string.tab_preferences, PreferencesFragment.class);
+    fragments.put(R.string.tab_setup, SetupFragment.class);
+    fragments.put(R.string.tab_debugging, DebuggingFragment.class);
   }
 
   @Override
@@ -85,8 +86,9 @@ public class MainActivity extends Activity implements ActionBar.TabListener
     startService(intent);
 
     String action = getIntent().getAction();
-    if ( action != null && action.equals("android.hardware.usb.action.USB_DEVICE_ATTACHED") )
+    if ( action != null && action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED) )
     {
+      Log.d(TAG, "USB_DEVICE_ATTACHED intent received");
       Intent service = new Intent(getApplicationContext(), BMWiService.class);
       service.setAction(BMWiService.EVENT_USB_DEVICE_ATTACHED);
       startService(service);
@@ -95,16 +97,16 @@ public class MainActivity extends Activity implements ActionBar.TabListener
 
     super.onCreate(savedInstanceState);
 
-
     setContentView(R.layout.activity_main);
 
     ActionBar actionBar = getActionBar();
     actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-    for ( Map.Entry<String, Class<? extends Fragment>> e : fragments.entrySet() )
+    for ( Map.Entry<Integer, Class<? extends Fragment>> e : fragments.entrySet() )
     {
       ActionBar.Tab tab = actionBar.newTab();
-      tab.setText(e.getKey());
+      tab.setTag(e.getKey());
+      tab.setText(getString(e.getKey()));
       tab.setTabListener(this);
       actionBar.addTab(tab);
     }
@@ -113,12 +115,11 @@ public class MainActivity extends Activity implements ActionBar.TabListener
   @Override
   public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
   {
-    Log.d("LOL", tab.getText() + " selected");
+    Log.d(TAG, "Tab \"" + tab.getText() + "\" selected");
     Fragment fragment = null;
     try
     {
-      String tabName = String.valueOf(tab.getText());
-      Class<? extends Fragment> fragmentClass = fragments.get(tabName);
+      Class<? extends Fragment> fragmentClass = fragments.get((Integer)tab.getTag());
       Constructor<? extends Fragment> fragmentConstructor = fragmentClass.getConstructor();
       fragment = fragmentConstructor.newInstance();
 

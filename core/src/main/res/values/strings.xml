@@ -9,4 +9,8 @@
   <string name="label_permission_send">Send New BusMessage</string>
   <string name="desc_permission_send">Send new BusMessage broadcasts to the service.</string>
 
+  <string name="tab_plugins">Plugins</string>
+  <string name="tab_preferences">Preferences</string>
+  <string name="tab_setup">Setup</string>
+  <string name="tab_debugging">Debugging</string>
 </resources>
