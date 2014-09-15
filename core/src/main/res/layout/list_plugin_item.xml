@@ -21,6 +21,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_toLeftOf="@+id/textPluginAuthor"
+    android:layout_toStartOf="@+id/textPluginAuthor"
     android:text="Author:"
     android:textAppearance="?android:attr/textAppearanceSmall"/>
 
@@ -29,6 +30,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_alignParentRight="true"
+    android:layout_alignParentEnd="true"
     android:text="Vadim Osovskiy"
     android:textAppearance="?android:attr/textAppearanceSmall"/>
 
@@ -38,6 +40,6 @@
     android:layout_height="wrap_content"
     android:layout_below="@+id/textPluginName"
     android:text="package.name.com"
-    android:textSize="12dp"/>
+    android:textSize="12sp"/>
 
 </RelativeLayout>
