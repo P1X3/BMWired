@@ -100,15 +100,18 @@ public class MainActivity extends Activity implements ActionBar.TabListener
     setContentView(R.layout.activity_main);
 
     ActionBar actionBar = getActionBar();
-    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-    for ( Map.Entry<Integer, Class<? extends Fragment>> e : fragments.entrySet() )
+    if (actionBar != null)
     {
-      ActionBar.Tab tab = actionBar.newTab();
-      tab.setTag(e.getKey());
-      tab.setText(getString(e.getKey()));
-      tab.setTabListener(this);
-      actionBar.addTab(tab);
+      actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+      for ( Map.Entry<Integer, Class<? extends Fragment>> e : fragments.entrySet() )
+      {
+        ActionBar.Tab tab = actionBar.newTab();
+        tab.setTag(e.getKey());
+        tab.setText(getString(e.getKey()));
+        tab.setTabListener(this);
+        actionBar.addTab(tab);
+      }
     }
   }
 
@@ -127,19 +130,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener
       bundle.putParcelable(Messenger.class.getSimpleName(), serviceMessenger);
       fragment.setArguments(bundle);
     }
-    catch ( NoSuchMethodException e )
-    {
-      e.printStackTrace();
-    }
-    catch ( InvocationTargetException e )
-    {
-      e.printStackTrace();
-    }
-    catch ( InstantiationException e )
-    {
-      e.printStackTrace();
-    }
-    catch ( IllegalAccessException e )
+    catch ( NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e )
     {
       e.printStackTrace();
     }
