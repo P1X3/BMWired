@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-  package="com.osovskiy.bmwinterface.plugin.steeringwheelcontrols"
+  package="com.osovskiy.bmwired.plugin.steeringwheelcontrols"
   xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <uses-permission android:name="com.osovskiy.bmwinterface.permission.RECEIVE_MSG"/>
+  <uses-permission android:name="com.osovskiy.bmwired.permission.RECEIVE_MSG"/>
 
   <application
     android:allowBackup="true"
     android:icon="@drawable/ic_launcher"
     android:label="@string/app_name">
     <activity
-      android:name=".MainActivity"
+      android:name="com.osovskiy.bmwired.plugin.steeringwheelcontrols.MainActivity"
       android:label="@string/app_name">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
@@ -19,9 +19,9 @@
       </intent-filter>
     </activity>
 
-    <receiver android:name=".BusMessageReceiver">
+    <receiver android:name="com.osovskiy.bmwired.plugin.steeringwheelcontrols.BusMessageReceiver">
       <intent-filter>
-        <action android:name="com.osovskiy.bmwinterface.ACTION_NEW_BUS_MESSAGE"/>
+        <action android:name="com.osovskiy.bmwired.ACTION_NEW_BUS_MESSAGE"/>
       </intent-filter>
     </receiver>
 

@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-  <string name="app_name">BMWinterface</string>
-  <string name="title_activity_my">MyActivity</string>
-  <string name="hello_world">Hello world!</string>
-  <string name="action_settings">Settings</string>
+  <string name="app_name">BMWired</string>
 
   <string name="label_permission_receive">Receive New BusMessage</string>
   <string name="desc_permission_receive">Receive new BusMessage broadcasts from the service.</string>

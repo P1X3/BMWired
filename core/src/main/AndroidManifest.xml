@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-  package="com.osovskiy.bmwinterface"
+  package="com.osovskiy.bmwired"
   xmlns:android="http://schemas.android.com/apk/res/android">
 
   <uses-permission android:name="android.permission.BLUETOOTH"/>
@@ -8,19 +8,19 @@
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
   <uses-permission android:name="android.permission.USB_PERMISSION"/>
 
-  <uses-permission android:name="com.osovskiy.bmwinterface.permission.RECEIVE_MSG" />
-  <uses-permission android:name="com.osovskiy.bmwinterface.permission.SEND_MSG" />
+  <uses-permission android:name="com.osovskiy.bmwired.permission.RECEIVE_MSG" />
+  <uses-permission android:name="com.osovskiy.bmwired.permission.SEND_MSG" />
 
   <uses-feature android:name="android.hardware.usb.host"/>
 
   <permission
-    android:name="com.osovskiy.bmwinterface.permission.RECEIVE_MSG"
+    android:name="com.osovskiy.bmwired.permission.RECEIVE_MSG"
     android:description="@string/desc_permission_receive"
     android:label="@string/label_permission_receive"
     android:protectionLevel="normal"/>
 
   <permission
-    android:name="com.osovskiy.bmwinterface.permission.SEND_MSG"
+    android:name="com.osovskiy.bmwired.permission.SEND_MSG"
     android:description="@string/desc_permission_send"
     android:label="@string/label_permission_send"
     android:protectionLevel="normal"/>
@@ -32,7 +32,7 @@
     android:theme="@style/AppTheme">
 
     <activity
-      android:name=".MainActivity"
+      android:name="com.osovskiy.bmwired.MainActivity"
       android:label="@string/app_name"
       android:theme="@style/AppTheme">
       <intent-filter>
@@ -48,10 +48,10 @@
     </activity>
 
     <service
-      android:name=".BMWiService"
+      android:name="com.osovskiy.bmwired.BMWiService"
       android:exported="false"
-      android:label="BMWinterfaceService"
-      android:process=":bmwinterface"/>
+      android:label="BMWiredService"
+      android:process=":bmwired"/>
 
   </application>
 
