@@ -42,19 +42,19 @@ public class PreferencesFragment extends PreferenceFragment
 
   private void setupPreferences(SharedPreferences sharedPreferences)
   {
-    if (sharedPreferences.getBoolean("bluetooth_interface", false))
+    if (sharedPreferences.getBoolean(getString(R.string.preference_key_bluetooth_interface), false))
     {
       PreferenceScreen preferenceScreen = getPreferenceScreen();
-      preferenceScreen.findPreference("bluetooth_mac").setEnabled(true);
-      preferenceScreen.findPreference("bluetooth_attempts").setEnabled(true);
-      preferenceScreen.findPreference("bluetooth_delay").setEnabled(true);
+      preferenceScreen.findPreference(getString(R.string.preference_key_bluetooth_mac)).setEnabled(true);
+      preferenceScreen.findPreference(getString(R.string.preference_key_bluetooth_attempts)).setEnabled(true);
+      preferenceScreen.findPreference(getString(R.string.preference_key_bluetooth_delay)).setEnabled(true);
     }
     else
     {
       PreferenceScreen preferenceScreen = getPreferenceScreen();
-      preferenceScreen.findPreference("bluetooth_mac").setEnabled(false);
-      preferenceScreen.findPreference("bluetooth_attempts").setEnabled(false);
-      preferenceScreen.findPreference("bluetooth_delay").setEnabled(false);
+      preferenceScreen.findPreference(getString(R.string.preference_key_bluetooth_mac)).setEnabled(false);
+      preferenceScreen.findPreference(getString(R.string.preference_key_bluetooth_attempts)).setEnabled(false);
+      preferenceScreen.findPreference(getString(R.string.preference_key_bluetooth_delay)).setEnabled(false);
     }
   }
 }

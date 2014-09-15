@@ -129,7 +129,7 @@ public class BMWiService extends Service
       }
     }
 
-    busInterface.tryOpen((prefs.getBoolean("bluetooth_interface", false)) ? BusInterface.Type.BLUETOOTH : BusInterface.Type.SERIAL);
+    busInterface.tryOpen((prefs.getBoolean(getString(R.string.preference_key_bluetooth_interface), false)) ? BusInterface.Type.BLUETOOTH : BusInterface.Type.SERIAL);
 
     return START_STICKY;
   }
@@ -161,7 +161,7 @@ public class BMWiService extends Service
         case MSG_BUSINTERFACE_OPEN:
           if (busInterface == null)
             busInterface = new BusInterface(getApplicationContext(), new Handler(), eventListener);
-          busInterface.tryOpen((prefs.getBoolean("bluetooth_interface", false)) ? BusInterface.Type.BLUETOOTH : BusInterface.Type.SERIAL);
+          busInterface.tryOpen((prefs.getBoolean(getString(R.string.preference_key_bluetooth_interface), false)) ? BusInterface.Type.BLUETOOTH : BusInterface.Type.SERIAL);
           break;
         case MSG_BUSINTERFACE_CLOSE:
           if (busInterface != null)

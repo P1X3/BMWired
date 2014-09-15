@@ -13,6 +13,7 @@ import android.util.Log;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
+import com.osovskiy.bmwired.R;
 import com.osovskiy.bmwired.bus.worker.BluetoothBusInterfaceWorker;
 import com.osovskiy.bmwired.bus.worker.BusInterfaceWorker;
 import com.osovskiy.bmwired.bus.worker.SerialBusInterfaceWorker;
@@ -76,7 +77,7 @@ public class BusInterface
     {
       case BLUETOOTH:
       {
-        String selectedBluetooth = preferences.getString("bluetooth_mac", null);
+        String selectedBluetooth = preferences.getString(context.getString(R.string.preference_key_bluetooth_mac), null);
 
         if (selectedBluetooth != null)
         {
@@ -117,8 +118,8 @@ public class BusInterface
       break;
       case SERIAL:
       {
-        String selectedDevice = preferences.getString("serial_name", null);
-        int selectedPort = Integer.valueOf(preferences.getString("serial_port", "0"));
+        String selectedDevice = preferences.getString(context.getString(R.string.preference_key_serial_name), null);
+        int selectedPort = Integer.valueOf(preferences.getString(context.getString(R.string.preference_key_serial_port), "0"));
 
         Log.d(TAG, "Opening " + selectedDevice + ", port " + selectedPort);
 

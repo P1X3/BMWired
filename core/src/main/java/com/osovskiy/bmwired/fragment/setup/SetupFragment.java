@@ -27,9 +27,6 @@ import com.osovskiy.bmwired.R;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Administrator on 8/22/2014.
- */
 public class SetupFragment extends Fragment implements AdapterView.OnItemClickListener
 {
   List<UsbSerialDriver> listDrivers = new ArrayList<>();
@@ -76,7 +73,7 @@ public class SetupFragment extends Fragment implements AdapterView.OnItemClickLi
     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
     UsbSerialDriver selectedDriver = listDrivers.get(position);
-    preferences.edit().putString("serial_name", selectedDriver.getDevice().getDeviceName());
+    preferences.edit().putString(getString(R.string.preference_key_serial_name), selectedDriver.getDevice().getDeviceName());
   }
 
   private class LoadUSBDevices extends AsyncTask<Void, Void, Void>

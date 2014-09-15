@@ -2,9 +2,6 @@ package com.osovskiy.bmwired.fragment.debugging;
 
 import com.osovskiy.bmwired.lib.BusMessage;
 
-/**
- * Created by Administrator on 8/29/2014.
- */
 public class DebugBusMessage extends BusMessage
 {
   private String description;

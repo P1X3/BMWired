@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-  <PreferenceCategory android:title="Serial">
+  <PreferenceCategory android:title="@string/preference_category_serial">
     <EditTextPreference
-      android:key="serial_name"
-      android:summary="Name of the selected driver"
-      android:title="Driver name"/>
+      android:key="@string/preference_key_serial_name"
+      android:summary="@string/preference_summary_serial_name"
+      android:title="@string/preference_title_serial_name"/>
     <EditTextPreference
-      android:key="serial_port"
-      android:summary="Port number to use for connection"
-      android:title="Port"
+      android:key="@string/preference_key_serial_port"
+      android:summary="@string/preference_summary_serial_port"
+      android:title="@string/preference_title_serial_port"
       android:inputType="number"/>
   </PreferenceCategory>
-  <PreferenceCategory android:title="Bluetooth">
+  <PreferenceCategory android:title="@string/preference_category_bluetooth">
     <CheckBoxPreference
       android:defaultValue="false"
-      android:key="bluetooth_interface"
-      android:summary="Use bluetooth interface instead of serial"
-      android:title="Enable"/>
+      android:key="@string/preference_key_bluetooth_interface"
+      android:summary="@string/preference_summary_bluetooth_interface"
+      android:title="@string/preference_title_bluetooth_interface"/>
     <EditTextPreference
       android:defaultValue="00:14:01:02:30:79"
-      android:key="bluetooth_mac"
-      android:summary="MAC address of bluetooth interface"
-      android:title="MAC"/>
+      android:key="@string/preference_key_bluetooth_mac"
+      android:summary="@string/preference_summary_bluetooth_mac"
+      android:title="@string/preference_title_bluetooth_mac"/>
     <EditTextPreference
       android:defaultValue="5"
-      android:key="bluetooth_attempts"
-      android:summary="Number of connection attempts to make"
-      android:title="Connection attempts"
+      android:key="@string/preference_key_bluetooth_attempts"
+      android:summary="@string/preference_summary_bluetooth_attempts"
+      android:title="@string/preference_title_bluetooth_attempts"
       android:inputType="number"/>
     <EditTextPreference
       android:defaultValue="2"
-      android:key="bluetooth_delay"
-      android:summary="Delay, in seconds, between connection attempts"
-      android:title="Delay"
+      android:key="@string/preference_key_bluetooth_delay"
+      android:summary="@string/preference_summary_bluetooth_delay"
+      android:title="@string/preference_title_bluetooth_delay"
       android:inputType="number"/>
   </PreferenceCategory>
 </PreferenceScreen>

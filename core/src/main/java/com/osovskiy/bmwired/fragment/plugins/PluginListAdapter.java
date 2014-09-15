@@ -12,9 +12,6 @@ import com.osovskiy.bmwired.R;
 
 import java.util.List;
 
-/**
- * Created by Administrator on 8/27/2014.
- */
 public class PluginListAdapter extends ArrayAdapter<Plugin>
 {
   Context context;

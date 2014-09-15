@@ -32,9 +32,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Administrator on 8/27/2014.
- */
 public class DebuggingFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemClickListener
 {
   List<DebugBusMessage> messages = new ArrayList<>();

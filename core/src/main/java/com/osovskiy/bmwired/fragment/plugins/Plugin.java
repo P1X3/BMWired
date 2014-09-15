@@ -1,8 +1,5 @@
 package com.osovskiy.bmwired.fragment.plugins;
 
-/**
- * Created by Administrator on 8/27/2014.
- */
 public class Plugin
 {
   private String name;

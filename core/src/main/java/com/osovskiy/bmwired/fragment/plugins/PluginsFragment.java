@@ -20,9 +20,6 @@ import com.osovskiy.bmwired.lib.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Administrator on 8/22/2014.
- */
 public class PluginsFragment extends ListFragment
 {
   List<Plugin> pluginsList = new ArrayList<>();
