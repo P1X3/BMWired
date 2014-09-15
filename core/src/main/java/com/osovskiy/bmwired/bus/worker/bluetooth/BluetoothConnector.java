@@ -31,9 +31,7 @@ public class BluetoothConnector
 
   public boolean isConnected()
   {
-    if ( socket != null )
-      return socket.getUnderlyingSocket().isConnected();
-    return false;
+    return ( socket != null ) && socket.getUnderlyingSocket().isConnected();
   }
 
   public BluetoothSocketWrapper connect()
