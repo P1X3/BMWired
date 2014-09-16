@@ -84,8 +84,9 @@ public class MainActivity extends Activity implements ActionBar.TabListener
     {
       e.printStackTrace();
     }
-    FragmentManager fm = getFragmentManager();
-    fm.beginTransaction().replace(R.id.fragment_container, fragment).commit();
+    FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+    fragmentTransaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+    fragmentTransaction.replace(R.id.fragment_container, fragment).commit();
   }
 
   @Override
