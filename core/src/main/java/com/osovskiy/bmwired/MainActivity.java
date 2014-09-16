@@ -73,20 +73,27 @@ public class MainActivity extends Activity implements ActionBar.TabListener
   public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
   {
     Log.d(TAG, "Tab \"" + tab.getText() + "\" selected");
-    Fragment fragment = null;
-    try
+
+    FragmentManager fragmentManager = getFragmentManager();
+    Fragment fragment = fragmentManager.findFragmentByTag(String.valueOf(tab.getTag()));
+
+    if (fragment == null)
     {
-      Class<? extends Fragment> fragmentClass = fragments.get((Integer) tab.getTag());
-      Constructor<? extends Fragment> fragmentConstructor = fragmentClass.getConstructor();
-      fragment = fragmentConstructor.newInstance();
+      try
+      {
+        Class<? extends Fragment> fragmentClass = fragments.get((Integer) tab.getTag());
+        Constructor<? extends Fragment> fragmentConstructor = fragmentClass.getConstructor();
+        fragment = fragmentConstructor.newInstance();
+      }
+      catch ( NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e )
+      {
+        e.printStackTrace();
+      }
     }
-    catch ( NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e )
-    {
-      e.printStackTrace();
-    }
-    FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+
+    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
     fragmentTransaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
-    fragmentTransaction.replace(R.id.fragment_container, fragment).commit();
+    fragmentTransaction.replace(R.id.fragment_container, fragment, String.valueOf(tab.getTag())).addToBackStack(null).commit();
   }
 
   @Override
