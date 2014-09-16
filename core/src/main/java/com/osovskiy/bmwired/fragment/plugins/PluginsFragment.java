@@ -89,13 +89,11 @@ public class PluginsFragment extends ListFragment
 
         if ( receiveGranted || sendGranted )
         {
-          Bundle metaData = packageInfo.metaData;
-          if ( metaData != null )
-          {
-            String name = String.valueOf(packageInfo.loadLabel(pm));
-            String author = metaData.getString("plugin_author");
-            pluginsList.add(new Plugin(name, author, packageInfo.packageName));
-          }
+          String author = "empty";
+          if ( packageInfo.metaData != null )
+            author = packageInfo.metaData.getString("plugin_author");
+
+          pluginsList.add(new Plugin(String.valueOf(packageInfo.loadLabel(pm)), author, packageInfo.packageName));
         }
       }
       return null;
