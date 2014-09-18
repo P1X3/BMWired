@@ -2,7 +2,6 @@ package com.osovskiy.bmwired.fragment.preferences;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceScreen;
 import android.support.v4.preference.PreferenceFragment;
 
 import com.osovskiy.bmwired.R;
@@ -42,19 +41,25 @@ public class PreferencesFragment extends PreferenceFragment
 
   private void setupPreferences(SharedPreferences sharedPreferences)
   {
-    if ( sharedPreferences.getBoolean(getString(R.string.preference_key_bluetooth_interface), false) )
+    String selectedInterface = sharedPreferences.getString(getString(R.string.preference_key_interface_type), "Serial");
+
+    if ( selectedInterface.equals("Serial") )
     {
-      PreferenceScreen preferenceScreen = getPreferenceScreen();
-      preferenceScreen.findPreference(getString(R.string.preference_key_bluetooth_mac)).setEnabled(true);
-      preferenceScreen.findPreference(getString(R.string.preference_key_bluetooth_attempts)).setEnabled(true);
-      preferenceScreen.findPreference(getString(R.string.preference_key_bluetooth_delay)).setEnabled(true);
+      findPreference(getString(R.string.preference_category_serial)).setEnabled(true);
+      findPreference(getString(R.string.preference_category_bluetooth)).setEnabled(false);
+      findPreference(getString(R.string.preference_category_ioio)).setEnabled(false);
     }
-    else
+    else if ( selectedInterface.equals("Bluetooth") )
     {
-      PreferenceScreen preferenceScreen = getPreferenceScreen();
-      preferenceScreen.findPreference(getString(R.string.preference_key_bluetooth_mac)).setEnabled(false);
-      preferenceScreen.findPreference(getString(R.string.preference_key_bluetooth_attempts)).setEnabled(false);
-      preferenceScreen.findPreference(getString(R.string.preference_key_bluetooth_delay)).setEnabled(false);
+      findPreference(getString(R.string.preference_category_serial)).setEnabled(false);
+      findPreference(getString(R.string.preference_category_bluetooth)).setEnabled(true);
+      findPreference(getString(R.string.preference_category_ioio)).setEnabled(false);
+    }
+    else if ( selectedInterface.equals("IOIO") )
+    {
+      findPreference(getString(R.string.preference_category_serial)).setEnabled(false);
+      findPreference(getString(R.string.preference_category_bluetooth)).setEnabled(false);
+      findPreference(getString(R.string.preference_category_ioio)).setEnabled(true);
     }
   }
 }

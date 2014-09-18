@@ -16,6 +16,7 @@ import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.osovskiy.bmwired.R;
 import com.osovskiy.bmwired.bus.worker.BluetoothBusInterfaceWorker;
 import com.osovskiy.bmwired.bus.worker.BusInterfaceWorker;
+import com.osovskiy.bmwired.bus.worker.IOIOBusInterfaceWorker;
 import com.osovskiy.bmwired.bus.worker.SerialBusInterfaceWorker;
 import com.osovskiy.bmwired.bus.worker.bluetooth.BluetoothConnector;
 import com.osovskiy.bmwired.bus.worker.bluetooth.BluetoothSocketWrapper;
@@ -77,6 +78,8 @@ public class BusInterface
         return Type.Bluetooth;
       else if ( workerThread instanceof SerialBusInterfaceWorker )
         return Type.Serial;
+      else if ( workerThread instanceof IOIOBusInterfaceWorker )
+        return Type.IOIO;
     }
 
     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -188,9 +191,6 @@ public class BusInterface
   public interface EventListener
   {
     void newMessage(BusMessage message);
-
-    void newSync(boolean sync);
-
     void workerClosing(ClosingReason reason);
 
     public enum ClosingReason

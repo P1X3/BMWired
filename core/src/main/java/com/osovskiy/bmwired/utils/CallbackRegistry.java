@@ -1,5 +1,7 @@
 package com.osovskiy.bmwired.utils;
 
+import android.os.RemoteException;
+
 import com.osovskiy.bmwired.lib.IBMWiServiceCallback;
 
 import java.util.Collection;

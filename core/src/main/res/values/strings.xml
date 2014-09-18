@@ -18,6 +18,7 @@
   <string name="preference_category_general">General</string>
   <string name="preference_category_serial">Serial</string>
   <string name="preference_category_bluetooth">Bluetooth</string>
+  <string name="preference_category_ioio">IOIO</string>
 
   <string name="preference_key_serial_name">serial_name</string>
   <string name="preference_summary_serial_name">Name of the selected driver</string>
@@ -26,10 +27,6 @@
   <string name="preference_key_serial_port">serial_port</string>
   <string name="preference_summary_serial_port">Port number to use for connection</string>
   <string name="preference_title_serial_port">Port</string>
-
-  <string name="preference_key_bluetooth_interface">bluetooth_interface</string>
-  <string name="preference_summary_bluetooth_interface">Use bluetooth interface instead of serial</string>
-  <string name="preference_title_bluetooth_interface">Enable</string>
 
   <string name="preference_key_bluetooth_mac">bluetooth_mac</string>
   <string name="preference_summary_bluetooth_mac">MAC address of bluetooth interface</string>

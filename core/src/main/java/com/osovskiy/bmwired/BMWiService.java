@@ -130,15 +130,23 @@ public class BMWiService extends Service
     }
 
     @Override
-    public void newSync(boolean sync)
+    public void workerClosing(final ClosingReason closingReason)
     {
-      Log.d(TAG, "New sync state: " + sync);
-    }
+      callbackRegistry.callAll(new CallbackRegistry.CallbackAction()
+      {
+        @Override
+        public void run(IBMWiServiceCallback callback)
+        {
+          try
+          {
+            callback.onInterfaceClosed(closingReason.toString());
+          }
+          catch ( RemoteException e )
+          {
 
-    @Override
-    public void workerClosing(ClosingReason closingReason)
-    {
-      Log.d(TAG, "Worker closed " + closingReason.toString());
+          }
+        }
+      });
     }
   };
   private final IBMWiService.Stub mBinder = new IBMWiService.Stub()
@@ -156,13 +164,13 @@ public class BMWiService extends Service
     }
 
     @Override
-    public String registerCallback(IBMWiServiceCallback callback) throws RemoteException
+    public String registerCallback(IBMWiServiceCallback callback)
     {
       return callbackRegistry.register(callback).toString();
     }
 
     @Override
-    public void unregisterCallback(String uuid) throws RemoteException
+    public void unregisterCallback(String uuid)
     {
       callbackRegistry.unregister(UUID.fromString(uuid));
     }

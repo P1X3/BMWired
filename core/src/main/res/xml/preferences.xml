@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-  <PreferenceCategory android:title="@string/preference_category_general">
-    <ListPreference android:key="@string/preference_key_interface_type"
-                    android:summary="@string/preference_summary_interface_type"
-                    android:title="@string/preference_title_interface_type"
-                    android:entries="@array/preference_array_interface_type"
-                    android:entryValues="@array/preference_array_interface_type"/>
+  <PreferenceCategory
+    android:key="@string/preference_category_general"
+    android:title="@string/preference_category_general">
+    <ListPreference
+      android:entries="@array/preference_array_interface_type"
+      android:entryValues="@array/preference_array_interface_type"
+      android:key="@string/preference_key_interface_type"
+      android:summary="@string/preference_summary_interface_type"
+      android:title="@string/preference_title_interface_type"/>
   </PreferenceCategory>
-  <PreferenceCategory android:title="@string/preference_category_serial">
+  <PreferenceCategory
+    android:key="@string/preference_category_serial"
+    android:title="@string/preference_category_serial">
     <EditTextPreference
       android:key="@string/preference_key_serial_name"
       android:summary="@string/preference_summary_serial_name"
       android:title="@string/preference_title_serial_name"/>
     <EditTextPreference
+      android:inputType="number"
       android:key="@string/preference_key_serial_port"
       android:summary="@string/preference_summary_serial_port"
-      android:title="@string/preference_title_serial_port"
-      android:inputType="number"/>
+      android:title="@string/preference_title_serial_port"/>
   </PreferenceCategory>
-  <PreferenceCategory android:title="@string/preference_category_bluetooth">
-    <CheckBoxPreference
-      android:defaultValue="false"
-      android:key="@string/preference_key_bluetooth_interface"
-      android:summary="@string/preference_summary_bluetooth_interface"
-      android:title="@string/preference_title_bluetooth_interface"/>
+  <PreferenceCategory
+    android:key="@string/preference_category_bluetooth"
+    android:title="@string/preference_category_bluetooth">
     <EditTextPreference
       android:defaultValue="00:14:01:02:30:79"
       android:key="@string/preference_key_bluetooth_mac"
@@ -32,15 +34,20 @@
       android:title="@string/preference_title_bluetooth_mac"/>
     <EditTextPreference
       android:defaultValue="5"
+      android:inputType="number"
       android:key="@string/preference_key_bluetooth_attempts"
       android:summary="@string/preference_summary_bluetooth_attempts"
-      android:title="@string/preference_title_bluetooth_attempts"
-      android:inputType="number"/>
+      android:title="@string/preference_title_bluetooth_attempts"/>
     <EditTextPreference
       android:defaultValue="2"
+      android:inputType="number"
       android:key="@string/preference_key_bluetooth_delay"
       android:summary="@string/preference_summary_bluetooth_delay"
-      android:title="@string/preference_title_bluetooth_delay"
-      android:inputType="number"/>
+      android:title="@string/preference_title_bluetooth_delay"/>
+  </PreferenceCategory>
+  <PreferenceCategory
+    android:key="@string/preference_category_ioio"
+    android:title="@string/preference_category_ioio">
+
   </PreferenceCategory>
 </PreferenceScreen>
