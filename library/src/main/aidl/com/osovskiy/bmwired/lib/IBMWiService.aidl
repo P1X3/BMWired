@@ -9,6 +9,6 @@ interface IBMWiService
   void sendMessageToBus(in BusMessage msg);
   void sendMessageFromBus(in BusMessage msg);
 
-  void registerCallback(IBMWiServiceCallback callback);
-  void unregisterCallback(IBMWiServiceCallback callback);
+  String registerCallback(IBMWiServiceCallback callback);
+  void unregisterCallback(String uuid);
 }
