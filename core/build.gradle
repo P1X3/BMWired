@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId "com.osovskiy.bmwired"
         minSdkVersion 14
-        targetSdkVersion 19
+        targetSdkVersion 20
         versionCode 3
         versionName "2.0"
     }
@@ -39,4 +39,6 @@ dependencies {
     //compile 'com.hoho.android:usb-serial-for-android:0.2.0-SNAPSHOT'
     compile project(':usbSerialForAndroid')
     compile project(':library')
+    compile 'com.android.support:support-v4:20.0.0'
+    compile project(':android-support-v4-preferencefragment-master')
 }
