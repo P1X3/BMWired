@@ -12,10 +12,10 @@
   <string name="tab_plugins">Plugins</string>
   <string name="tab_preferences">Preferences</string>
   <string name="tab_setup">Setup</string>
-  <string name="tab_debugging">Debugging</string>
 
   <!-- Preferences -->
 
+  <string name="preference_category_general">General</string>
   <string name="preference_category_serial">Serial</string>
   <string name="preference_category_bluetooth">Bluetooth</string>
 
@@ -42,5 +42,14 @@
   <string name="preference_key_bluetooth_delay">bluetooth_delay</string>
   <string name="preference_summary_bluetooth_delay">Delay, in seconds, between connection attempts</string>
   <string name="preference_title_bluetooth_delay">Delay</string>
+
+  <string name="preference_key_interface_type">interface_type</string>
+  <string-array name="preference_array_interface_type">
+    <item>Serial</item>
+    <item>Bluetooth</item>
+    <item>IOIO</item>
+  </string-array>
+  <string name="preference_summary_interface_type">Select interface type</string>
+  <string name="preference_title_interface_type">Interface</string>
 
 </resources>

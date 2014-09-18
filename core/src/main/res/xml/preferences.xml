@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+  <PreferenceCategory android:title="@string/preference_category_general">
+    <ListPreference android:key="@string/preference_key_interface_type"
+                    android:summary="@string/preference_summary_interface_type"
+                    android:title="@string/preference_title_interface_type"
+                    android:entries="@array/preference_array_interface_type"
+                    android:entryValues="@array/preference_array_interface_type"/>
+  </PreferenceCategory>
   <PreferenceCategory android:title="@string/preference_category_serial">
     <EditTextPreference
       android:key="@string/preference_key_serial_name"

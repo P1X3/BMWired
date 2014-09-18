@@ -37,49 +37,57 @@ public class BusInterface
   private EventListener eventListener;
   private BlockingQueue<BusMessage> queue = new LinkedBlockingQueue<>();
   private AsyncTask<Void, String, BluetoothSocketWrapper> bluetoothConnectTask;
-  private State state;
 
-  public BusInterface(Context context, Handler handler, EventListener el)
+  public BusInterface(Context context, EventListener el)
   {
     Log.d(TAG, "Creating BusInterface");
     this.context = context;
 
     eventListener = el;
+  }
 
-    state = State.DISCONNECTED;
+  public Type getInterfaceType()
+  {
+    if ( workerThread == null )
+      return null;
+
+    if ( workerThread instanceof SerialBusInterfaceWorker )
+      return Type.Serial;
+    else if ( workerThread instanceof BluetoothBusInterfaceWorker )
+      return Type.Bluetooth;
+    else
+      return null;
   }
 
   public void destroy()
   {
     Log.d(TAG, "Destroying BusInterface");
-    if ( workerThread != null )
-      workerThread.interrupt();
-    workerThread = null;
+    closeInterface();
 
     if ( bluetoothConnectTask != null )
       bluetoothConnectTask.cancel(true); // TODO: Does not work
     bluetoothConnectTask = null;
   }
 
-  public Type tryOpen(Type type)
+  public Type openInterface(Type type)
   {
     if ( workerThread != null )
     {
       if ( workerThread instanceof BluetoothBusInterfaceWorker )
-        return Type.BLUETOOTH;
+        return Type.Bluetooth;
       else if ( workerThread instanceof SerialBusInterfaceWorker )
-        return Type.SERIAL;
+        return Type.Serial;
     }
 
     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
     switch ( type )
     {
-      case BLUETOOTH:
+      case Bluetooth:
       {
         String selectedBluetooth = preferences.getString(context.getString(R.string.preference_key_bluetooth_mac), null);
 
-        if (selectedBluetooth != null)
+        if ( selectedBluetooth != null )
         {
           Log.d(TAG, "Attempting to open bluetooth device " + selectedBluetooth);
           BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
@@ -95,7 +103,7 @@ public class BusInterface
               {
                 try
                 {
-                  Thread.currentThread().sleep(2 * 1000);
+                  Thread.sleep(2 * 1000);
                 }
                 catch ( InterruptedException e )
                 {
@@ -116,7 +124,7 @@ public class BusInterface
         }
       }
       break;
-      case SERIAL:
+      case Serial:
       {
         String selectedDevice = preferences.getString(context.getString(R.string.preference_key_serial_name), null);
         int selectedPort = Integer.valueOf(preferences.getString(context.getString(R.string.preference_key_serial_port), "0"));
@@ -158,15 +166,31 @@ public class BusInterface
     return null;
   }
 
-  public void sendMsg(BusMessage message)
+  public void closeInterface()
+  {
+    if ( workerThread != null )
+      workerThread.interrupt();
+    workerThread = null;
+  }
+
+  public void queueMessage(BusMessage message)
   {
     queue.add(message);
+  }
+
+  public enum Type
+  {
+    Serial,
+    Bluetooth,
+    IOIO
   }
 
   public interface EventListener
   {
     void newMessage(BusMessage message);
+
     void newSync(boolean sync);
+
     void workerClosing(ClosingReason reason);
 
     public enum ClosingReason
@@ -175,17 +199,5 @@ public class BusInterface
       NonRecoverableError,
       Normal
     }
-  }
-
-  public enum Type
-  {
-    SERIAL,
-    BLUETOOTH
-  }
-
-  public enum State
-  {
-    CONNECTED,
-    DISCONNECTED
   }
 }

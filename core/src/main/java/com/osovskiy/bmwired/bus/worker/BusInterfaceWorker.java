@@ -11,8 +11,6 @@ import java.util.concurrent.BlockingQueue;
 
 public abstract class BusInterfaceWorker extends Thread
 {
-  public static final int MSG_NEW_SYNC_STATE = 0;
-  public static final int MSG_NEW_MESSAGE = 1;
   private static final int MSG_MIN_SIZE = 5;
   private final String TAG = this.getClass().getSimpleName();
 
