@@ -1,7 +1,6 @@
 package com.osovskiy.bmwired.fragment.setup;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.usb.UsbDevice;
@@ -9,6 +8,7 @@ import android.hardware.usb.UsbManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -90,7 +90,14 @@ public class SetupFragment extends Fragment implements AdapterView.OnItemClickLi
     @Override
     protected void onPostExecute(Void aVoid)
     {
-      adapter.notifyDataSetChanged();
+      getActivity().runOnUiThread(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          adapter.notifyDataSetChanged();
+        }
+      });
     }
   }
 

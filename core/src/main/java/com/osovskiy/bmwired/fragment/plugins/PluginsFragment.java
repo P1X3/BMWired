@@ -1,12 +1,14 @@
 package com.osovskiy.bmwired.fragment.plugins;
 
 import android.app.Activity;
-import android.app.ListFragment;
+
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,12 +25,14 @@ import java.util.List;
 
 public class PluginsFragment extends ListFragment
 {
+  private static final String TAG = PluginsFragment.class.getSimpleName();
+
   List<Plugin> pluginsList = new ArrayList<>();
   PluginListAdapter adapter;
 
   public PluginsFragment()
   {
-
+    Log.d(TAG, "constructor");
   }
 
   @Override
@@ -76,7 +80,6 @@ public class PluginsFragment extends ListFragment
       default:
         return super.onOptionsItemSelected(item);
     }
-
   }
 
   private class LoadPluginsTask extends AsyncTask<Void, Void, Void>
@@ -109,7 +112,14 @@ public class PluginsFragment extends ListFragment
     @Override
     protected void onPostExecute(Void aVoid)
     {
-      adapter.notifyDataSetChanged();
+      getActivity().runOnUiThread(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          adapter.notifyDataSetChanged();
+        }
+      });
     }
   }
 }

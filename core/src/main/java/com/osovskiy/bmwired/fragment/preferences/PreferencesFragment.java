@@ -2,8 +2,8 @@ package com.osovskiy.bmwired.fragment.preferences;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
+import android.support.v4.preference.PreferenceFragment;
 
 import com.osovskiy.bmwired.R;
 
@@ -42,7 +42,7 @@ public class PreferencesFragment extends PreferenceFragment
 
   private void setupPreferences(SharedPreferences sharedPreferences)
   {
-    if (sharedPreferences.getBoolean(getString(R.string.preference_key_bluetooth_interface), false))
+    if ( sharedPreferences.getBoolean(getString(R.string.preference_key_bluetooth_interface), false) )
     {
       PreferenceScreen preferenceScreen = getPreferenceScreen();
       preferenceScreen.findPreference(getString(R.string.preference_key_bluetooth_mac)).setEnabled(true);
