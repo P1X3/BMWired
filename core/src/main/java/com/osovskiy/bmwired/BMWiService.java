@@ -6,54 +6,127 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.Handler;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.os.Binder;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.osovskiy.bmwired.bus.BusInterface;
 import com.osovskiy.bmwired.lib.BusMessage;
 import com.osovskiy.bmwired.lib.IBMWiService;
 import com.osovskiy.bmwired.lib.IBMWiServiceCallback;
 import com.osovskiy.bmwired.lib.Utils;
+import com.osovskiy.bmwired.utils.CallbackRegistry;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 public class BMWiService extends Service
 {
-  private List<IBMWiServiceCallback> callbacks = new ArrayList<>();
-  public static final String ACTION_STOP_SERVICE = "BMWiService.ACTION_STOP_SERVICE";
-  public static final String EVENT_USB_DEVICE_ATTACHED = "BMWiService.EVENT_USB_DEVICE_ATTACHED";
-  public static final int MSG_REGISTER_CLIENT = 0;
-  public static final int MSG_UNREGISTER_CLIENT = 1;
-  public static final int MSG_SENDTO_BUS = 2;
-  public static final int MSG_SENDFROM_BUS = 3;
-  public static final int MSG_BUSINTERFACE_OPEN = 4;
-  public static final int MSG_BUSINTERFACE_CLOSE = 5;
-  private final String TAG = this.getClass().getSimpleName();
+  private final static String TAG = BMWiService.class.getSimpleName();
+
+  public final static String ACTION_STOP_SERVICE = "BMWiService.ACTION_STOP_SERVICE";
+  public final static String EVENT_USB_DEVICE_ATTACHED = "BMWiService.EVENT_USB_DEVICE_ATTACHED";
+
+  private CallbackRegistry callbackRegistry = new CallbackRegistry();
+  private BusInterface busInterface;
+  private SharedPreferences prefs;
+
+  @Override
+  public IBinder onBind(Intent intent)
+  {
+    Log.d(TAG, "onBind");
+    PackageManager pm = getPackageManager();
+    int caller = Binder.getCallingUid();
+    Log.d(TAG, "Caller UID: " + caller);
+    String[] packages = pm.getPackagesForUid(caller);
+    for ( String s : packages )
+    {
+      try
+      {
+        ApplicationInfo applicationInfo = pm.getApplicationInfo(s, PackageManager.GET_META_DATA);
+        Log.d(TAG, "Package: " + applicationInfo.packageName);
+        boolean sendPermissionGranted = pm.checkPermission(Utils.PERMISSION_SEND_MESSAGE, applicationInfo.packageName) == PackageManager.PERMISSION_GRANTED;
+        Log.d(TAG, "Permission granted: " + sendPermissionGranted);
+        if ( sendPermissionGranted )
+          return mBinder;
+      }
+      catch ( PackageManager.NameNotFoundException e )
+      {
+        e.printStackTrace();
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public void onCreate()
+  {
+    prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+    openInterface();
+    registerReceiver(receiver, new IntentFilter(Utils.ACTION_SEND_BUS_MESSAGE), Utils.PERMISSION_SEND_MESSAGE, null);
+    super.onCreate();
+  }
+
+  @Override
+  public void onDestroy()
+  {
+    if ( busInterface != null )
+      busInterface.destroy();
+
+    unregisterReceiver(receiver);
+    super.onDestroy();
+  }
+
+  @Override
+  public int onStartCommand(Intent intent, int flags, int startId)
+  {
+    if ( intent != null && intent.getAction() != null && intent.getAction().equals(ACTION_STOP_SERVICE) )
+      stopSelf();
+
+    openInterface();
+    return START_STICKY;
+  }
+
+  private void openInterface()
+  {
+    if ( busInterface == null )
+      busInterface = new BusInterface(getApplicationContext(), eventListener);
+
+    BusInterface.Type selectedInterfaceType = BusInterface.Type.valueOf(prefs.getString(getString(R.string.preference_key_interface_type), "Serial"));
+
+    if ( busInterface.getInterfaceType() != selectedInterfaceType )
+      busInterface.closeInterface();
+
+    busInterface.openInterface(selectedInterfaceType);
+  }
+
   private final BusInterface.EventListener eventListener = new BusInterface.EventListener()
   {
     @Override
-    public void newMessage(BusMessage message)
+    public void newMessage(final BusMessage message)
     {
-      Log.d(TAG, "Broadcasting new message from bus");
       Intent intent = new Intent(Utils.ACTION_NEW_BUS_MESSAGE);
       intent.putExtra(BusMessage.class.getSimpleName(), message);
       sendBroadcast(intent);
 
-      try
+      callbackRegistry.callAll(new CallbackRegistry.CallbackAction()
       {
-        for ( IBMWiServiceCallback callback : callbacks )
-          callback.newMessageFromBus(message);
-      }
-      catch ( RemoteException e )
-      {
-        e.printStackTrace();
-      }
+        @Override
+        public void run(IBMWiServiceCallback callback)
+        {
+          try
+          {
+            callback.newMessageFromBus(message);
+          }
+          catch ( Exception e )
+          {
+            callbackRegistry.unregister(callback);
+          }
+        }
+      });
     }
 
     @Override
@@ -68,36 +141,30 @@ public class BMWiService extends Service
       Log.d(TAG, "Worker closed " + closingReason.toString());
     }
   };
-
   private final IBMWiService.Stub mBinder = new IBMWiService.Stub()
   {
     @Override
     public void sendMessageToBus(BusMessage msg) throws RemoteException
     {
-      Log.d(TAG, "Sending to bus: " + msg.toString());
-      busInterface.sendMsg(msg);
+      busInterface.queueMessage(msg);
     }
 
     @Override
     public void sendMessageFromBus(BusMessage msg) throws RemoteException
     {
-      //TODO: Broadcast new message from bus
-      Log.d(TAG, "Sending from bus: " + msg.toString());
       eventListener.newMessage(msg);
     }
 
     @Override
-    public void registerCallback(IBMWiServiceCallback callback) throws RemoteException
+    public String registerCallback(IBMWiServiceCallback callback) throws RemoteException
     {
-      Log.d(TAG, "Registering callback");
-      callbacks.add(callback);
+      return callbackRegistry.register(callback).toString();
     }
 
     @Override
-    public void unregisterCallback(IBMWiServiceCallback callback) throws RemoteException
+    public void unregisterCallback(String uuid) throws RemoteException
     {
-      Log.d(TAG, "Unregistering callback");
-      callbacks.remove(callback);
+      callbackRegistry.unregister(UUID.fromString(uuid));
     }
   };
   private final BroadcastReceiver receiver = new BroadcastReceiver()
@@ -105,119 +172,8 @@ public class BMWiService extends Service
     @Override
     public void onReceive(Context context, Intent intent)
     {
-      Log.d(TAG, "New broadcast message");
-      if ( intent.getAction() != null )
-      {
-        Toast.makeText(context, intent.getAction(), Toast.LENGTH_SHORT).show();
-
-        if ( intent.getAction().equals(Utils.ACTION_SEND_BUS_MESSAGE) )
-        {
-          Log.d(TAG, "Sending new message to bus");
-          busInterface.sendMsg((BusMessage) intent.getParcelableExtra(BusMessage.class.getSimpleName()));
-        }
-      }
+      if ( intent.getAction() != null && intent.getAction().equals(Utils.ACTION_SEND_BUS_MESSAGE) )
+        busInterface.queueMessage((BusMessage) intent.getParcelableExtra(BusMessage.class.getSimpleName()));
     }
   };
-  private BusInterface busInterface;
-  private SharedPreferences prefs;
-
-  public BMWiService()
-  {
-    Log.d(TAG, "Constructor");
-  }
-
-  @Override
-  public IBinder onBind(Intent intent)
-  {
-    Log.d(TAG, "onBind");
-    return mBinder;
-  }
-
-  @Override
-  public void onCreate()
-  {
-    Log.d(TAG, "onCreate");
-
-    busInterface = new BusInterface(getApplicationContext(), new Handler(), eventListener);
-    prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    IntentFilter intentFilter = new IntentFilter();
-    intentFilter.addAction(Utils.ACTION_SEND_BUS_MESSAGE);
-    registerReceiver(receiver, intentFilter, Utils.PERMISSION_SEND_MESSAGE, null);
-    super.onCreate();
-  }
-
-  @Override
-  public void onDestroy()
-  {
-    Log.d(TAG, "onDestroy");
-
-    if ( busInterface != null )
-      busInterface.destroy();
-
-    unregisterReceiver(receiver);
-
-    super.onDestroy();
-  }
-
-  @Override
-  public int onStartCommand(Intent intent, int flags, int startId)
-  {
-    Log.d(TAG, "onStartCommand");
-    if ( intent != null )
-    {
-      String action = intent.getAction();
-      if ( action != null )
-      {
-        Log.d(TAG, "Action: " + action);
-        if ( action.equals(ACTION_STOP_SERVICE) )
-        {
-          stopSelf();
-        }
-      }
-    }
-
-    busInterface.tryOpen(( prefs.getBoolean(getString(R.string.preference_key_bluetooth_interface), false) ) ? BusInterface.Type.BLUETOOTH : BusInterface.Type.SERIAL);
-
-    return START_STICKY;
-  }
-
-  /**
-   * Handler for incoming messages from bound clients
-   */
-  private class IncomingHandler extends Handler
-  {
-    @Override
-    public void handleMessage(Message msg)
-    {
-      switch ( msg.what )
-      {
-        case MSG_REGISTER_CLIENT:
-
-          break;
-        case MSG_UNREGISTER_CLIENT:
-
-          break;
-        case MSG_SENDTO_BUS:
-          msg.getData().setClassLoader(BusMessage.class.getClassLoader());
-          busInterface.sendMsg((BusMessage) msg.getData().getParcelable(BusMessage.class.getSimpleName()));
-          break;
-        case MSG_SENDFROM_BUS:
-          msg.getData().setClassLoader(BusMessage.class.getClassLoader());
-          eventListener.newMessage((BusMessage) msg.getData().getParcelable(BusMessage.class.getSimpleName()));
-          break;
-        case MSG_BUSINTERFACE_OPEN:
-          if ( busInterface == null )
-            busInterface = new BusInterface(getApplicationContext(), new Handler(), eventListener);
-          busInterface.tryOpen(( prefs.getBoolean(getString(R.string.preference_key_bluetooth_interface), false) ) ? BusInterface.Type.BLUETOOTH : BusInterface.Type.SERIAL);
-          break;
-        case MSG_BUSINTERFACE_CLOSE:
-          if ( busInterface != null )
-            busInterface.destroy();
-          busInterface = null;
-          break;
-        default:
-          super.handleMessage(msg);
-      }
-    }
-  }
 }
