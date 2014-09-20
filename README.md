@@ -1,5 +1,5 @@
 ## About
-BMWinterface is core application that acts as a gateway between BMW K/I-Bus and plugins. Plugins that satisfy requirments listed below can receive and send messages to/from the bus.
+BMWired is core application that acts as a gateway between BMW K/I-Bus and plugins. Plugins that satisfy requirments listed below can receive and send messages to/from the bus.
 
 ## Plugin Implementation
 All plugins must include library module as a dependency for receiving and/or sending messages.
