@@ -8,12 +8,12 @@ repositories {
 android {
     signingConfigs {
     }
-    compileSdkVersion 19
-    buildToolsVersion '20.0.0'
+    compileSdkVersion 21
+    buildToolsVersion '21.1.0'
     defaultConfig {
         applicationId "com.osovskiy.bmwired"
         minSdkVersion 14
-        targetSdkVersion 20
+        targetSdkVersion 21
         versionCode 3
         versionName "2.0"
     }
@@ -34,6 +34,6 @@ dependencies {
     //compile 'com.hoho.android:usb-serial-for-android:0.2.0-SNAPSHOT'
     compile project(':usbSerialForAndroid')
     compile project(':library')
-    compile 'com.android.support:support-v4:20.0.0'
+    compile 'com.android.support:support-v4:21.0.0'
     compile project(':android-support-v4-preferencefragment-master')
 }

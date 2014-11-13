@@ -1,4 +1,4 @@
 include ':core', ':library'
 include ':android-support-v4-preferencefragment-master', 'usbSerialForAndroid'
 project(':usbSerialForAndroid').projectDir = new File(settingsDir, '../usb-serial-for-android/usbSerialForAndroid')
-project(':android-support-v4-preferencefragment-master').projectDir = new File(settingsDir, '../android-support-v4-preferencefragment-master')
+project(':android-support-v4-preferencefragment-master').projectDir = new File(settingsDir, '../android-support-v4-preferencefragment')
