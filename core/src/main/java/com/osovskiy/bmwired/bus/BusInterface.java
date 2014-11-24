@@ -1,8 +1,6 @@
 package com.osovskiy.bmwired.bus;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.osovskiy.bmwired.bus.worker.BusInterfaceWorker;
@@ -20,20 +18,29 @@ public abstract class BusInterface
   protected BusInterfaceWorker workerThread;
   protected EventListener eventListener;
   protected BlockingQueue<BusMessage> queue = new LinkedBlockingQueue<>();
-  protected SharedPreferences preferences;
 
   protected BusInterface(Context context, EventListener el)
   {
     Log.d(TAG, "Creating BusInterface");
     this.context = context;
-    preferences = PreferenceManager.getDefaultSharedPreferences(context);
     eventListener = el;
   }
 
+  /**
+   * Open interface
+   */
   public abstract void open();
 
+  /**
+   * Close interface
+   */
   public abstract void close();
 
+  /**
+   * Queue message to be sent to the interface
+   *
+   * @param message Validated BusMessage
+   */
   public void queueMessage(BusMessage message)
   {
     queue.add(message);
@@ -47,8 +54,18 @@ public abstract class BusInterface
 
   public interface EventListener
   {
+    /**
+     * Called when new message is received from the interface
+     *
+     * @param message Validated BusMessage
+     */
     void newMessage(BusMessage message);
 
+    /**
+     * Called when worker is closing
+     *
+     * @param reason The reason worker has been closed
+     */
     void workerClosing(ClosingReason reason);
 
     public enum ClosingReason

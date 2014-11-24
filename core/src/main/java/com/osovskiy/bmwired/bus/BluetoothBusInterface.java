@@ -10,24 +10,27 @@ import com.osovskiy.bmwired.R;
 import com.osovskiy.bmwired.bus.worker.BluetoothBusInterfaceWorker;
 import com.osovskiy.bmwired.bus.worker.bluetooth.BluetoothConnector;
 import com.osovskiy.bmwired.bus.worker.bluetooth.BluetoothSocketWrapper;
+import com.osovskiy.bmwired.utils.PreferencesWrapper;
 
 import java.util.UUID;
 
 public class BluetoothBusInterface extends BusInterface
 {
   private static final String TAG = BluetoothBusInterface.class.getSimpleName();
+  private Preferences preferences;
 
   private AsyncTask<Void, String, BluetoothSocketWrapper> bluetoothConnectTask;
 
   public BluetoothBusInterface(Context context, EventListener el)
   {
     super(context, el);
+    preferences = new Preferences(context);
   }
 
   @Override
   public void open()
   {
-    String selectedBluetooth = preferences.getString(context.getString(R.string.preference_key_bluetooth_mac), null);
+    String selectedBluetooth = preferences.bluetoothDeviceMac();
 
     if ( selectedBluetooth != null )
     {
@@ -74,5 +77,18 @@ public class BluetoothBusInterface extends BusInterface
       bluetoothConnectTask.cancel(true); // TODO: Does not work
     }
     bluetoothConnectTask = null;
+  }
+
+  private static class Preferences extends PreferencesWrapper
+  {
+    protected Preferences(Context context)
+    {
+      super(context);
+    }
+
+    public String bluetoothDeviceMac()
+    {
+      return sharedPreferences.getString(context.getString(R.string.preference_bluetooth_mac_key), context.getString(R.string.preference_bluetooth_mac_default));
+    }
   }
 }

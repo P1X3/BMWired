@@ -1,6 +1,5 @@
 package com.osovskiy.bmwired.lib;
 
-import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -9,9 +8,80 @@ import java.util.Arrays;
 
 public class BusMessage implements Parcelable
 {
+  public static final Creator<BusMessage> CREATOR = new Creator<BusMessage>()
+  {
+
+    @Override
+    public BusMessage createFromParcel(Parcel source)
+    {
+      return new BusMessage(source);
+    }
+
+    @Override
+    public BusMessage[] newArray(int size)
+    {
+      return new BusMessage[size];
+    }
+  };
   private BusDevice source;
   private BusDevice destination;
   private byte[] payload;
+
+  /**
+   * Construct BusMessage using data byte array
+   *
+   * @param data Byte array containing valid data
+   */
+  private BusMessage(byte data[])
+  {
+    payload = Arrays.copyOfRange(data, 3, data.length - 2);
+    source = BusDevice.tryParse(data[0]);
+    destination = BusDevice.tryParse(data[2]);
+  }
+
+  private BusMessage(Parcel parcel)
+  {
+    this.source = (BusDevice) parcel.readSerializable();
+    this.destination = (BusDevice) parcel.readSerializable();
+    this.payload = new byte[parcel.readInt()];
+    parcel.readByteArray(this.payload);
+  }
+
+  /**
+   * Construct BusMessage
+   *
+   * @param source      BusDevice that message is sent from
+   * @param destination BusDevice that message is sent to
+   * @param payload     Payload
+   */
+  public BusMessage(BusDevice source, BusDevice destination, byte[] payload)
+  {
+    this.source = source;
+    this.destination = destination;
+    this.payload = payload;
+  }
+
+  /**
+   * Build message from byte array if it contains valid data
+   *
+   * @param msg Byte array containing the message
+   * @return BusMessage or null if checksum is not valid
+   */
+  public static BusMessage tryParse(byte[] msg)
+  {
+    byte testChecksum = 0;
+    for (int i = 0; i < msg.length - 1; i++)
+    {
+      testChecksum ^= msg[i];
+    }
+
+    if (testChecksum != msg[msg.length - 1])
+    {
+      return null;
+    }
+
+    return new BusMessage(msg);
+  }
 
   public BusDevice getSource()
   {
@@ -28,48 +98,11 @@ public class BusMessage implements Parcelable
     return payload;
   }
 
-  private BusMessage(byte data[])
-  {
-    payload = Arrays.copyOfRange(data, 3, data.length - 2);
-    source = BusDevice.tryParse(data[0]);
-    destination = BusDevice.tryParse(data[2]);
-  }
-
-  private BusMessage(Parcel parcel)
-  {
-    this.source = (BusDevice) parcel.readSerializable();
-    this.destination = (BusDevice) parcel.readSerializable();
-    this.payload = new byte[parcel.readInt()];
-    parcel.readByteArray(this.payload);
-  }
-
-  public BusMessage(BusDevice source, BusDevice destination, byte[] payload)
-  {
-    this.source = source;
-    this.destination = destination;
-    this.payload = payload;
-  }
-
   /**
-   * Build message from byte array if it contains valid data
+   * Build byte array containing valid message data ready to be sent to interface
    *
-   * @param msg
-   * @return BusMessage or null if checksum is not valid
+   * @return Byte array containing valid data
    */
-  public static BusMessage tryParse(byte[] msg)
-  {
-    byte testChecksum = 0;
-    for ( int i = 0; i < msg.length - 1; i++ )
-    {
-      testChecksum ^= msg[i];
-    }
-
-    if ( testChecksum != msg[msg.length - 1] )
-      return null;
-
-    return new BusMessage(msg);
-  }
-
   public byte[] build()
   {
     ByteBuffer bb = ByteBuffer.allocate(payload.length + 4);
@@ -85,28 +118,28 @@ public class BusMessage implements Parcelable
     return bb.array();
   }
 
+  /**
+   * Calculate checksum
+   *
+   * @return Byte containing checksum
+   */
   public byte calculateChecksum()
   {
     byte checksum = source.getId();
-    checksum ^= (byte)(payload.length+2);
+    checksum ^= (byte) (payload.length + 2);
     checksum ^= destination.getId();
-    for (byte b: payload)
-      checksum^= b;
+    for (byte b : payload)
+    {
+      checksum ^= b;
+    }
 
     return checksum;
-  }
-
-  public Intent getIntent(String action)
-  {
-    Intent intent = new Intent(action);
-    intent.putExtra(BusMessage.class.getSimpleName(), this);
-    return intent;
   }
 
   @Override
   public String toString()
   {
-    return "BusMessage[" + ( ( source == null ) ? "null" : source ) + " -> " + ( ( destination == null ) ? "null" : destination ) + "]";
+    return "BusMessage[" + ((source == null) ? "null" : source) + " -> " + ((destination == null) ? "null" : destination) + "]";
   }
 
   @Override
@@ -123,22 +156,6 @@ public class BusMessage implements Parcelable
     dest.writeInt(payload.length);
     dest.writeByteArray(payload);
   }
-
-  public static final Creator<BusMessage> CREATOR = new Creator<BusMessage>()
-  {
-
-    @Override
-    public BusMessage createFromParcel(Parcel source)
-    {
-      return new BusMessage(source);
-    }
-
-    @Override
-    public BusMessage[] newArray(int size)
-    {
-      return new BusMessage[size];
-    }
-  };
 
   public enum BusDevice
   {
@@ -166,19 +183,21 @@ public class BusMessage implements Parcelable
       this.id = (byte) id;
     }
 
+    public static BusDevice tryParse(byte device)
+    {
+      for (BusDevice d : BusDevice.values())
+      {
+        if (d.id == device)
+        {
+          return d;
+        }
+      }
+      return null;
+    }
+
     public byte getId()
     {
       return this.id;
-    }
-
-    public static BusDevice tryParse(byte device)
-    {
-      for ( BusDevice d : BusDevice.values() )
-      {
-        if ( d.id == device )
-          return d;
-      }
-      return null;
     }
   }
 }

@@ -41,7 +41,7 @@ public class PreferencesFragment extends PreferenceFragment
 
   private void setupPreferences(SharedPreferences sharedPreferences)
   {
-    String selectedInterface = sharedPreferences.getString(getString(R.string.preference_key_interface_type), "Serial");
+    String selectedInterface = sharedPreferences.getString(getString(R.string.preference_interface_type_key), "Serial");
 
     if ( selectedInterface.equals("Serial") )
     {

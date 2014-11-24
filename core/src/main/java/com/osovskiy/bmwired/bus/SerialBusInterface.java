@@ -11,6 +11,7 @@ import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.osovskiy.bmwired.R;
 import com.osovskiy.bmwired.bus.worker.SerialBusInterfaceWorker;
+import com.osovskiy.bmwired.utils.PreferencesWrapper;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,16 +20,19 @@ public class SerialBusInterface extends BusInterface
 {
   private static final String TAG = SerialBusInterface.class.getSimpleName();
 
+  private Preferences preferences;
+
   public SerialBusInterface(Context context, EventListener el)
   {
     super(context, el);
+    preferences = new Preferences(context);
   }
 
   @Override
   public void open()
   {
-    String selectedDevice = preferences.getString(context.getString(R.string.preference_key_serial_name), null);
-    int selectedPort = Integer.valueOf(preferences.getString(context.getString(R.string.preference_key_serial_port), "0"));
+    String selectedDevice = preferences.serialDeviceName();
+    int selectedPort = preferences.serialDevicePort();
 
     Log.d(TAG, "Opening " + selectedDevice + ", port " + selectedPort);
 
@@ -69,5 +73,23 @@ public class SerialBusInterface extends BusInterface
   public void close()
   {
 
+  }
+
+  private static class Preferences extends PreferencesWrapper
+  {
+    protected Preferences(Context context)
+    {
+      super(context);
+    }
+
+    public int serialDevicePort()
+    {
+      return Integer.valueOf(sharedPreferences.getString(context.getString(R.string.preference_serial_port_key), context.getString(R.string.preference_serial_port_default)));
+    }
+
+    public String serialDeviceName()
+    {
+      return sharedPreferences.getString(context.getString(R.string.preference_serial_name_key), context.getString(R.string.preference_serial_name_default));
+    }
   }
 }

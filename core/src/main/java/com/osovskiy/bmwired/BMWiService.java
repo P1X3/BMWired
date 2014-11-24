@@ -5,13 +5,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.osovskiy.bmwired.bus.BluetoothBusInterface;
@@ -22,6 +20,7 @@ import com.osovskiy.bmwired.lib.IBMWiService;
 import com.osovskiy.bmwired.lib.IBMWiServiceCallback;
 import com.osovskiy.bmwired.lib.Utils;
 import com.osovskiy.bmwired.utils.CallbackRegistry;
+import com.osovskiy.bmwired.utils.PreferencesWrapper;
 
 import java.util.UUID;
 
@@ -115,7 +114,7 @@ public class BMWiService extends Service
   };
   private CallbackRegistry callbackRegistry = new CallbackRegistry();
   private BusInterface busInterface;
-  private SharedPreferences prefs;
+  private Preferences preferences;
 
   @Override
   public IBinder onBind(Intent intent)
@@ -149,7 +148,7 @@ public class BMWiService extends Service
   @Override
   public void onCreate()
   {
-    prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+    preferences = new Preferences(getApplicationContext());
     openInterface();
     registerReceiver(receiver, new IntentFilter(Utils.ACTION_SEND_BUS_MESSAGE), Utils.PERMISSION_SEND_MESSAGE, null);
     super.onCreate();
@@ -181,7 +180,7 @@ public class BMWiService extends Service
 
   private void openInterface()
   {
-    BusInterface.Type selectedInterfaceType = BusInterface.Type.valueOf(prefs.getString(getString(R.string.preference_key_interface_type), "Serial"));
+    BusInterface.Type selectedInterfaceType = preferences.selectedInterfaceType();
 
     if (busInterface != null)
     {
@@ -207,5 +206,18 @@ public class BMWiService extends Service
     }
 
     busInterface.open();
+  }
+
+  private static class Preferences extends PreferencesWrapper
+  {
+    protected Preferences(Context context)
+    {
+      super(context);
+    }
+
+    public BusInterface.Type selectedInterfaceType()
+    {
+      return BusInterface.Type.valueOf(sharedPreferences.getString(context.getString(R.string.preference_interface_type_key), context.getString(R.string.preference_interface_type_default)));
+    }
   }
 }

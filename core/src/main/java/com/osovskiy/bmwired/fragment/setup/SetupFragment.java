@@ -73,7 +73,7 @@ public class SetupFragment extends Fragment implements AdapterView.OnItemClickLi
     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
     UsbSerialDriver selectedDriver = listDrivers.get(position);
-    preferences.edit().putString(getString(R.string.preference_key_serial_name), selectedDriver.getDevice().getDeviceName()).apply();
+    preferences.edit().putString(getString(R.string.preference_serial_name_key), selectedDriver.getDevice().getDeviceName()).apply();
   }
 
   private class LoadUSBDevices extends AsyncTask<Void, Void, Void>
