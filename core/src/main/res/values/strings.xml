@@ -20,33 +20,39 @@
   <string name="preference_category_bluetooth">Bluetooth</string>
   <string name="preference_category_ioio">IOIO</string>
 
-  <string name="preference_key_serial_name">serial_name</string>
-  <string name="preference_summary_serial_name">Name of the selected driver</string>
-  <string name="preference_title_serial_name">Name</string>
+  <string name="preference_serial_name_key">serial_name</string>
+  <string name="preference_serial_name_default" translatable="false">Change Me</string>
+  <string name="preference_serial_name_summary">Name of the selected driver</string>
+  <string name="preference_serial_name_title">Name</string>
 
-  <string name="preference_key_serial_port">serial_port</string>
-  <string name="preference_summary_serial_port">Port number to use for connection</string>
-  <string name="preference_title_serial_port">Port</string>
+  <string name="preference_serial_port_key">serial_port</string>
+  <string name="preference_serial_port_default" translatable="false">0</string>
+  <string name="preference_serial_port_summary">Port number to use for connection</string>
+  <string name="preference_serial_port_title">Port</string>
 
-  <string name="preference_key_bluetooth_mac">bluetooth_mac</string>
-  <string name="preference_summary_bluetooth_mac">MAC address of bluetooth interface</string>
-  <string name="preference_title_bluetooth_mac">MAC</string>
+  <string name="preference_bluetooth_mac_key">bluetooth_mac</string>
+  <string name="preference_bluetooth_mac_default" translatable="false">DE:AD:BE:EF:DE:AD</string>
+  <string name="preference_bluetooth_mac_summary">MAC address of bluetooth interface</string>
+  <string name="preference_bluetooth_mac_title">MAC</string>
 
-  <string name="preference_key_bluetooth_attempts">bluetooth_attempts</string>
-  <string name="preference_summary_bluetooth_attempts">Number of connection attempts to make</string>
-  <string name="preference_title_bluetooth_attempts">Connection attempts</string>
+  <string name="preference_bluetooth_attempts_key">bluetooth_attempts</string>
+  <string name="preference_bluetooth_attempts_default" translatable="false">10</string>
+  <string name="preference_bluetooth_attempts_summary">Number of connection attempts to make</string>
+  <string name="preference_bluetooth_attempts_title">Connection attempts</string>
 
-  <string name="preference_key_bluetooth_delay">bluetooth_delay</string>
-  <string name="preference_summary_bluetooth_delay">Delay, in seconds, between connection attempts</string>
-  <string name="preference_title_bluetooth_delay">Delay</string>
+  <string name="preference_bluetooth_delay_key">bluetooth_delay</string>
+  <string name="preference_bluetooth_delay_default" translatable="false">2</string>
+  <string name="preference_bluetooth_delay_summary">Delay, in seconds, between connection attempts</string>
+  <string name="preference_bluetooth_delay_title">Delay</string>
 
-  <string name="preference_key_interface_type">interface_type</string>
-  <string-array name="preference_array_interface_type">
+  <string name="preference_interface_type_key">interface_type</string>
+  <string name="preference_interface_type_default" translatable="false">Serial</string>
+  <string-array name="preference_interface_type_array">
     <item>Serial</item>
     <item>Bluetooth</item>
     <item>IOIO</item>
   </string-array>
-  <string name="preference_summary_interface_type">Select interface type</string>
-  <string name="preference_title_interface_type">Interface</string>
+  <string name="preference_interface_type_summary">Select interface type</string>
+  <string name="preference_interface_type_title">Interface</string>
 
 </resources>
