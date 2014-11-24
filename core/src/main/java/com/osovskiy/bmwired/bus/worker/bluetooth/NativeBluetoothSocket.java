@@ -46,7 +46,7 @@ public class NativeBluetoothSocket implements BluetoothSocketWrapper
   @Override
   public String getRemoveDeviceAddress()
   {
-    return null;
+    return socket.getRemoteDevice().getAddress();
   }
 
   @Override
