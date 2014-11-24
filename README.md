@@ -1,3 +1,5 @@
+# NOTE: Document is not up to date
+
 ## About
 BMWired is core application that acts as a gateway between BMW K/I-Bus and plugins. Plugins that satisfy requirments listed below can receive and send messages to/from the bus.
 
