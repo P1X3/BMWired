@@ -17,10 +17,6 @@ import com.osovskiy.bmwired.fragment.plugins.PluginsFragment;
 import com.osovskiy.bmwired.fragment.preferences.PreferencesFragment;
 import com.osovskiy.bmwired.fragment.setup.SetupFragment;
 
-import java.util.HashMap;
-import java.util.Map;
-
-
 public class MainActivity extends ActionBarActivity
 {
   private static final String TAG = MainActivity.class.getSimpleName();
