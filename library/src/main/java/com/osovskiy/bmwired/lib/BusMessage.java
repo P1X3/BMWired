@@ -109,11 +109,11 @@ public class BusMessage implements Parcelable
 
     byte length = (byte) (bb.capacity() - 2);
 
-    bb.put(source.getId());
-    bb.put(length);
-    bb.put(destination.getId());
-    bb.put(payload);
-    bb.put(calculateChecksum());
+    bb.put(source.getId())
+        .put(length)
+        .put(destination.getId())
+        .put(payload)
+        .put(calculateChecksum());
 
     return bb.array();
   }
