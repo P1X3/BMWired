@@ -1,7 +1,5 @@
 package com.osovskiy.bmwired.utils;
 
-import android.os.RemoteException;
-
 import com.osovskiy.bmwired.lib.IBMWiServiceCallback;
 
 import java.util.Collection;
@@ -9,50 +7,67 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.UUID;
 
-public class CallbackRegistry extends TreeMap<UUID, IBMWiServiceCallback>
+public class CallbackRegistry
 {
+  TreeMap<UUID, IBMWiServiceCallback> registry;
+
+  public CallbackRegistry()
+  {
+    registry = new TreeMap<>();
+  }
+
   public UUID register(IBMWiServiceCallback callback)
   {
     UUID uuid = UUID.randomUUID();
-    put(uuid, callback);
+    registry.put(uuid, callback);
     return uuid;
   }
 
   public IBMWiServiceCallback unregister(UUID uuid)
   {
-    return  remove(uuid);
+    return registry.remove(uuid);
   }
 
   public boolean unregister(IBMWiServiceCallback callback)
   {
-    return values().remove(callback);
+    return registry.values().remove(callback);
   }
 
   public void callAll(CallbackAction callbackAction)
   {
     if (callbackAction == null)
+    {
       return;
+    }
 
-    Collection<IBMWiServiceCallback> callbacks = values();
-    for ( IBMWiServiceCallback callback: callbacks)
+    Collection<IBMWiServiceCallback> callbacks = registry.values();
+    for (IBMWiServiceCallback callback : callbacks)
+    {
       callbackAction.run(callback);
+    }
   }
 
   public void call(UUID uuid, CallbackAction callbackAction)
   {
     if (callbackAction == null)
+    {
       return;
+    }
 
-    callbackAction.run(get(uuid));
+    callbackAction.run(registry.get(uuid));
   }
 
-  public void call(List<UUID> uuids, CallbackAction callbackAction)
+  public void call(List<UUID> uuidList, CallbackAction callbackAction)
   {
     if (callbackAction == null)
+    {
       return;
+    }
 
-    for (UUID uuid: uuids)
-      callbackAction.run(get(uuid));
+    for (UUID uuid : uuidList)
+    {
+      callbackAction.run(registry.get(uuid));
+    }
   }
 
   public interface CallbackAction
