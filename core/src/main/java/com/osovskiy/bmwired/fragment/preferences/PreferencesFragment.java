@@ -43,23 +43,8 @@ public class PreferencesFragment extends PreferenceFragment
   {
     String selectedInterface = sharedPreferences.getString(getString(R.string.preference_interface_type_key), "Serial");
 
-    if ( selectedInterface.equals("Serial") )
-    {
-      findPreference(getString(R.string.preference_category_serial)).setEnabled(true);
-      findPreference(getString(R.string.preference_category_bluetooth)).setEnabled(false);
-      findPreference(getString(R.string.preference_category_ioio)).setEnabled(false);
-    }
-    else if ( selectedInterface.equals("Bluetooth") )
-    {
-      findPreference(getString(R.string.preference_category_serial)).setEnabled(false);
-      findPreference(getString(R.string.preference_category_bluetooth)).setEnabled(true);
-      findPreference(getString(R.string.preference_category_ioio)).setEnabled(false);
-    }
-    else if ( selectedInterface.equals("IOIO") )
-    {
-      findPreference(getString(R.string.preference_category_serial)).setEnabled(false);
-      findPreference(getString(R.string.preference_category_bluetooth)).setEnabled(false);
-      findPreference(getString(R.string.preference_category_ioio)).setEnabled(true);
-    }
+    findPreference(getString(R.string.preference_category_serial)).setEnabled(selectedInterface.equals("Serial"));
+    findPreference(getString(R.string.preference_category_bluetooth)).setEnabled(selectedInterface.equals("Bluetooth"));
+    findPreference(getString(R.string.preference_category_ioio)).setEnabled(selectedInterface.equals("IOIO"));
   }
 }
