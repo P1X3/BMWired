@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-abstract class PreferencesWrapper
+public abstract class PreferencesWrapper
 {
   protected SharedPreferences sharedPreferences;
   protected Context context;
