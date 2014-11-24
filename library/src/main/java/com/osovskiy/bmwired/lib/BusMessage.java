@@ -69,15 +69,30 @@ public class BusMessage implements Parcelable
    */
   public static BusMessage tryParse(byte[] msg)
   {
-    byte testChecksum = 0;
-    for (int i = 0; i < msg.length - 1; i++)
-    {
-      testChecksum ^= msg[i];
-    }
+    return tryParse(msg, false);
+  }
 
-    if (testChecksum != msg[msg.length - 1])
+  /**
+   * Build message from byte array if it contains valid data
+   *
+   * @param msg           Byte array containing the message
+   * @param skipChecksum  Set to true if checksum is not to be checked
+   * @return BusMessage or null if checksum is not valid
+   */
+  public static BusMessage tryParse(byte[] msg, boolean skipChecksum)
+  {
+    if (!skipChecksum)
     {
-      return null;
+      byte testChecksum = 0;
+      for (int i = 0; i < msg.length - 1; i++)
+      {
+        testChecksum ^= msg[i];
+      }
+
+      if (testChecksum != msg[msg.length - 1])
+      {
+        return null;
+      }
     }
 
     return new BusMessage(msg);
