@@ -21,8 +21,8 @@ public class MainActivity extends ActionBarActivity
 {
   private static final String TAG = MainActivity.class.getSimpleName();
 
-  private String[] fragmentNames = new String[3];
-  private Fragment[] fragments = new Fragment[3];
+  private final String[] fragmentNames = new String[3];
+  private final Fragment[] fragments = new Fragment[3];
   private DrawerLayout drawerLayout;
   private ListView listView;
 
