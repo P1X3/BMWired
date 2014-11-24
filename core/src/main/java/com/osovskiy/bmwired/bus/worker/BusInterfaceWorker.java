@@ -151,14 +151,19 @@ public abstract class BusInterfaceWorker extends Thread
         int assumedLength = ( peek(1) & 0xFF ) + 2;
         if ( size() >= assumedLength )
         {
-          ByteBuffer byteBuffer = ByteBuffer.allocate(assumedLength);
-
-          for ( int i = 0; i < assumedLength; i++ )
+          byte[] byteBuffer = new byte[assumedLength];
+          // Check the checksum of assumed message
+          byte testChecksum = peek();
+          byteBuffer[0] = peek();
+          for ( int i = 1; i < assumedLength - 1 ; i++ )
           {
-            byteBuffer.put(peek(i));
+            byteBuffer[i] = peek(i);
+            testChecksum ^= byteBuffer[i];
           }
 
-          BusMessage busMessage = BusMessage.tryParse(byteBuffer.array());
+          BusMessage busMessage = null;
+          if (testChecksum == (byteBuffer[assumedLength - 1] = peek(assumedLength-1)))
+            busMessage = BusMessage.tryParse(byteBuffer, true);
 
           if ( busMessage != null )
           {
