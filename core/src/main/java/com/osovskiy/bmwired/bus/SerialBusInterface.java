@@ -72,7 +72,8 @@ public class SerialBusInterface extends BusInterface
   @Override
   public void close()
   {
-
+    workerThread.interrupt();
+    //TODO: Check if anything needs to be properly closed
   }
 
   private static class Preferences extends PreferencesWrapper
