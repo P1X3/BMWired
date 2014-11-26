@@ -14,8 +14,8 @@ public abstract class BusInterfaceWorker extends Thread
   private final static String TAG = BusInterfaceWorker.class.getSimpleName();
   private static final int MSG_MIN_SIZE = 5;
 
-  private byte[] buffer;
-  private int tail, head;
+  private byte[] buffer = new byte[4096];
+  private int tail = 0, head = 0;
   private Handler outputHandler;
   private BusInterface.EventListener eventListener;
   protected BlockingQueue<BusMessage> queue;
@@ -25,10 +25,6 @@ public abstract class BusInterfaceWorker extends Thread
     this.outputHandler = handler;
     this.eventListener = el;
     this.queue = queue;
-
-    buffer = new byte[4096];
-    tail = 0;
-    head = 0;
   }
 
   private void fireNewMessage(final BusMessage message)
