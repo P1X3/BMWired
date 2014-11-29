@@ -11,6 +11,11 @@
       android:key="@string/preference_interface_type_key"
       android:summary="@string/preference_interface_type_summary"
       android:title="@string/preference_interface_type_title"/>
+    <CheckBoxPreference
+      android:defaultValue="@string/preference_reopen_interface_default"
+      android:key="@string/preference_reopen_interface_key"
+      android:summary="@string/preference_reopen_interface_summary"
+      android:title="@string/preference_reopen_interface_title"/>
   </PreferenceCategory>
   <PreferenceCategory
     android:key="@string/preference_category_serial"

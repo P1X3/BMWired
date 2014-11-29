@@ -51,4 +51,9 @@
   <string name="preference_interface_type_summary">Select interface type</string>
   <string name="preference_interface_type_title">Interface</string>
 
+  <string name="preference_reopen_interface_key">reopen_interface</string>
+  <string name="preference_reopen_interface_default" translatable="false">true</string>
+  <string name="preference_reopen_interface_summary">Attempt to re-open interface if closed due to error</string>
+  <string name="preference_reopen_interface_title">Re-open interface</string>
+
 </resources>
