@@ -22,6 +22,7 @@ import com.osovskiy.bmwired.lib.Utils;
 import com.osovskiy.bmwired.utils.CallbackRegistry;
 import com.osovskiy.bmwired.utils.PreferencesWrapper;
 
+import java.util.Collections;
 import java.util.UUID;
 
 public class BMWiService extends Service
@@ -133,7 +134,7 @@ public class BMWiService extends Service
     int caller = Binder.getCallingUid();
     Log.d(TAG, "Caller UID: " + caller);
     String[] packages = pm.getPackagesForUid(caller);
-    for (String s : packages)
+    for (String s : (packages == null ? (String[])Collections.emptySet().toArray() : packages))
     {
       try
       {
