@@ -46,6 +46,9 @@ public class BMWiService extends Service
         @Override
         public void run(IBMWiServiceCallback callback)
         {
+          if (callback == null)
+            return;
+
           try
           {
             callback.newMessageFromBus(message);
@@ -66,6 +69,9 @@ public class BMWiService extends Service
         @Override
         public void run(IBMWiServiceCallback callback)
         {
+          if (callback == null)
+            return;
+
           try
           {
             callback.onInterfaceClosed(closingReason.toString());
