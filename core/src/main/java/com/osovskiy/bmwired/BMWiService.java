@@ -54,7 +54,7 @@ public class BMWiService extends Service
           {
             callback.newMessageFromBus(message);
           }
-          catch (Exception e)
+          catch (RemoteException e)
           {
             callbackRegistry.unregister(callback);
           }
