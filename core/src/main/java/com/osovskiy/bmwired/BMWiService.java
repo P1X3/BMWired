@@ -34,6 +34,9 @@ public class BMWiService extends Service
     @Override
     public void newMessage(final BusMessage message)
     {
+      if (message == null)
+        return;
+
       Intent intent = new Intent(Utils.ACTION_NEW_BUS_MESSAGE);
       intent.putExtra(BusMessage.class.getSimpleName(), message);
       sendBroadcast(intent);
