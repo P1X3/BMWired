@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -103,7 +104,18 @@ public class PluginsFragment extends ListFragment
           if ( packageInfo.metaData != null )
             author = packageInfo.metaData.getString("plugin_author");
 
-          pluginsList.add(new Plugin(String.valueOf(packageInfo.loadLabel(pm)), author, packageInfo.packageName));
+          Drawable pluginIcon = getResources().getDrawable(R.drawable.ic_launcher);
+
+          try
+          {
+            pluginIcon = pm.getApplicationIcon(packageInfo.packageName);
+          }
+          catch (PackageManager.NameNotFoundException e)
+          {
+            e.printStackTrace();
+          }
+
+          pluginsList.add(new Plugin(String.valueOf(packageInfo.loadLabel(pm)), author, packageInfo.packageName, pluginIcon));
         }
       }
       return null;

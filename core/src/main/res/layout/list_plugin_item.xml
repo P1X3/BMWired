@@ -6,13 +6,20 @@
                 android:orientation="vertical"
                 android:padding="4dp">
 
+  <ImageView
+    android:id="@+id/drawableIcon"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/ic_launcher"
+    android:layout_alignParentStart="true"
+    android:layout_alignParentLeft="true"/>
+
   <TextView
     android:id="@+id/textPluginName"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_alignParentLeft="true"
-    android:layout_alignParentStart="true"
-    android:layout_alignParentTop="true"
+    android:layout_toRightOf="@+id/drawableIcon"
+    android:layout_toEndOf="@+id/drawableIcon"
     android:text="Plugin Name"
     android:textAppearance="?android:attr/textAppearanceMedium"/>
 
@@ -39,6 +46,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_below="@+id/textPluginName"
+    android:layout_alignStart="@+id/textPluginName"
+    android:layout_alignLeft="@+id/textPluginName"
     android:text="package.name.com"
     android:textSize="12sp"/>
 
