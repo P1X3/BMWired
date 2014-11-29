@@ -7,7 +7,7 @@
                 android:padding="4dp">
 
   <ImageView
-    android:id="@+id/drawableIcon"
+    android:id="@+id/drawablePluginIcon"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:src="@drawable/ic_launcher"
@@ -18,8 +18,8 @@
     android:id="@+id/textPluginName"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_toRightOf="@+id/drawableIcon"
-    android:layout_toEndOf="@+id/drawableIcon"
+    android:layout_toRightOf="@+id/drawablePluginIcon"
+    android:layout_toEndOf="@+id/drawablePluginIcon"
     android:text="Plugin Name"
     android:textAppearance="?android:attr/textAppearanceMedium"/>
 
