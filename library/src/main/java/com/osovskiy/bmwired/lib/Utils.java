@@ -7,6 +7,7 @@ public class Utils
 
   public static final String PERMISSION_SEND_MESSAGE = "com.osovskiy.bmwired.permission.SEND_MSG";
   public static final String PERMISSION_RECEIVE_MESSAGE = "com.osovskiy.bmwired.permission.RECEIVE_MSG";
+  public static final String PERMISSION_AIDL = "com.osovskiy.bmwired.permission.AIDL";
 
   public static byte[] hexStringToByteArray(String s)
   {

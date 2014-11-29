@@ -143,7 +143,7 @@ public class BMWiService extends Service
       {
         ApplicationInfo applicationInfo = pm.getApplicationInfo(s, PackageManager.GET_META_DATA);
         Log.d(TAG, "Package: " + applicationInfo.packageName);
-        boolean sendPermissionGranted = pm.checkPermission(Utils.PERMISSION_SEND_MESSAGE, applicationInfo.packageName) == PackageManager.PERMISSION_GRANTED;
+        boolean sendPermissionGranted = pm.checkPermission(Utils.PERMISSION_AIDL, applicationInfo.packageName) == PackageManager.PERMISSION_GRANTED;
         Log.d(TAG, "Permission granted: " + sendPermissionGranted);
         if (sendPermissionGranted)
         {
