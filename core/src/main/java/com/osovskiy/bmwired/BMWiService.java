@@ -83,6 +83,9 @@ public class BMWiService extends Service
           }
         }
       });
+
+      if (preferences.reOpenOnError())
+        busInterface.open();
     }
   };
   private final IBMWiService.Stub mBinder = new IBMWiService.Stub()
@@ -228,6 +231,11 @@ public class BMWiService extends Service
     public BusInterface.Type selectedInterfaceType()
     {
       return BusInterface.Type.valueOf(sharedPreferences.getString(context.getString(R.string.preference_interface_type_key), context.getString(R.string.preference_interface_type_default)));
+    }
+
+    public boolean reOpenOnError()
+    {
+      return sharedPreferences.getBoolean(context.getString(R.string.preference_reopen_interface_key), Boolean.valueOf(context.getString(R.string.preference_reopen_interface_default)));
     }
   }
 }
