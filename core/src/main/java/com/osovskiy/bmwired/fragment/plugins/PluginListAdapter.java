@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.osovskiy.bmwired.R;
@@ -40,6 +41,7 @@ public class PluginListAdapter extends ArrayAdapter<Plugin>
     ( (TextView) convertView.findViewById(R.id.textPluginName) ).setText(plugin.getName());
     ( (TextView) convertView.findViewById(R.id.textPluginAuthor) ).setText(plugin.getAuthor());
     ( (TextView) convertView.findViewById(R.id.textPluginPackage) ).setText(plugin.getPackage());
+    ( (ImageView) convertView.findViewById(R.id.drawablePluginIcon)).setImageDrawable(plugin.getIcon());
 
     return convertView;
   }
