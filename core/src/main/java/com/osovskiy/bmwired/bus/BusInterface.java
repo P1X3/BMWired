@@ -43,7 +43,8 @@ public abstract class BusInterface
    */
   public void queueMessage(BusMessage message)
   {
-    queue.add(message);
+    if (message != null)
+      queue.add(message);
   }
 
   public enum Type
