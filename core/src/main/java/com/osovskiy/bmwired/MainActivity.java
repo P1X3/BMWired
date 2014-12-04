@@ -5,6 +5,7 @@ import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,8 @@ public class MainActivity extends ActionBarActivity
   private final Fragment[] fragments = new Fragment[3];
   private DrawerLayout drawerLayout;
   private ListView listView;
+  private String title;
+  private ActionBar actionBar;
 
   public MainActivity()
   {
@@ -55,13 +58,41 @@ public class MainActivity extends ActionBarActivity
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
+    actionBar = getSupportActionBar();
+
     drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+    drawerLayout.setDrawerListener(new DrawerLayout.DrawerListener()
+    {
+      @Override
+      public void onDrawerSlide(View drawerView, float slideOffset)
+      {
+
+      }
+
+      @Override
+      public void onDrawerOpened(View drawerView)
+      {
+        actionBar.setTitle(getString(R.string.app_name));
+      }
+
+      @Override
+      public void onDrawerClosed(View drawerView)
+      {
+        actionBar.setTitle(title);
+      }
+
+      @Override
+      public void onDrawerStateChanged(int newState)
+      {
+
+      }
+    });
     listView = (ListView) findViewById(R.id.drawer_list);
     listView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, fragmentNames));
     listView.setOnItemClickListener(new DrawerItemClickListener());
 
-    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    getSupportActionBar().setHomeButtonEnabled(true);
+    actionBar.setDisplayHomeAsUpEnabled(true);
+    actionBar.setHomeButtonEnabled(true);
 
     if (findViewById(R.id.fragment_container) != null)
     {
@@ -77,7 +108,7 @@ public class MainActivity extends ActionBarActivity
     {
       listView.setItemChecked(position, true);
 
-      getSupportActionBar().setTitle(fragmentNames[position]);
+      actionBar.setTitle(title = fragmentNames[position]);
 
       getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragments[position]).commit();
       drawerLayout.closeDrawer(listView);
