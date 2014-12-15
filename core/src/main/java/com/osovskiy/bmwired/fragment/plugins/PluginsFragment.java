@@ -3,10 +3,7 @@ package com.osovskiy.bmwired.fragment.plugins;
 import android.app.Activity;
 
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -17,9 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.osovskiy.bmwired.R;
-import com.osovskiy.bmwired.lib.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +43,7 @@ public class PluginsFragment extends ListFragment
   public void onAttach(Activity activity)
   {
     super.onAttach(activity);
-    new LoadPluginsTask().execute();
+    new PluginLoader(this).execute();
   }
 
   @Override
@@ -76,62 +73,17 @@ public class PluginsFragment extends ListFragment
     switch ( item.getItemId() )
     {
       case R.id.actions_refresh:
-        new LoadPluginsTask().execute();
+        new PluginLoader(this).execute();
         return true;
       default:
         return super.onOptionsItemSelected(item);
     }
   }
 
-  private class LoadPluginsTask extends AsyncTask<Void, Void, Void>
+  protected void updatePlugins(List<Plugin> plugins)
   {
-    @Override
-    protected Void doInBackground(Void... params)
-    {
-      PackageManager pm = getActivity().getPackageManager();
-      List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-
-      pluginsList.clear();
-
-      for ( ApplicationInfo packageInfo : packages )
-      {
-        boolean receiveGranted = (PackageManager.PERMISSION_GRANTED == pm.checkPermission(Utils.PERMISSION_RECEIVE_MESSAGE, packageInfo.packageName));
-        boolean sendGranted = (PackageManager.PERMISSION_GRANTED == pm.checkPermission(Utils.PERMISSION_SEND_MESSAGE, packageInfo.packageName));
-
-        if ( receiveGranted || sendGranted )
-        {
-          String author = "empty";
-          if ( packageInfo.metaData != null )
-            author = packageInfo.metaData.getString("plugin_author");
-
-          Drawable pluginIcon = getResources().getDrawable(R.drawable.ic_launcher);
-
-          try
-          {
-            pluginIcon = pm.getApplicationIcon(packageInfo.packageName);
-          }
-          catch (PackageManager.NameNotFoundException e)
-          {
-            e.printStackTrace();
-          }
-
-          pluginsList.add(new Plugin(String.valueOf(packageInfo.loadLabel(pm)), author, packageInfo.packageName, pluginIcon));
-        }
-      }
-      return null;
-    }
-
-    @Override
-    protected void onPostExecute(Void aVoid)
-    {
-      getActivity().runOnUiThread(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          adapter.notifyDataSetChanged();
-        }
-      });
-    }
+    pluginsList = plugins;
+    adapter.notifyDataSetChanged();
+    Toast.makeText(getActivity(), plugins.size() + " plugin(s) found", Toast.LENGTH_SHORT).show();
   }
 }
