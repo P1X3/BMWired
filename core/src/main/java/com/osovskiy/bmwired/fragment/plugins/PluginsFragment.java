@@ -1,7 +1,5 @@
 package com.osovskiy.bmwired.fragment.plugins;
 
-import android.app.Activity;
-
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -40,19 +38,14 @@ public class PluginsFragment extends ListFragment
   }
 
   @Override
-  public void onAttach(Activity activity)
-  {
-    super.onAttach(activity);
-    new PluginLoader(this).execute();
-  }
-
-  @Override
   public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
   {
     setHasOptionsMenu(true);
 
     adapter = new PluginListAdapter(getActivity(), R.layout.list_plugin_item, pluginsList);
     setListAdapter(adapter);
+
+    new PluginLoader(this).execute();
 
     return super.onCreateView(inflater, container, savedInstanceState);
   }
