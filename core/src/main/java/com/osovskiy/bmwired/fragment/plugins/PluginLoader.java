@@ -27,7 +27,6 @@ class PluginLoader extends AsyncTask<Void, Void, List<Plugin>>
     PackageManager pm = pluginsFragment.getActivity().getPackageManager();
     List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
 
-    Drawable defaultDrawable = pluginsFragment.getResources().getDrawable(R.drawable.ic_launcher);
     for ( ApplicationInfo packageInfo : packages )
     {
       boolean receiveGranted = (PackageManager.PERMISSION_GRANTED == pm.checkPermission(Utils.PERMISSION_RECEIVE_MESSAGE, packageInfo.packageName));
@@ -35,20 +34,16 @@ class PluginLoader extends AsyncTask<Void, Void, List<Plugin>>
 
       if ( receiveGranted || sendGranted )
       {
-        String author = (packageInfo.metaData != null) ? packageInfo.metaData.getString("plugin_author") : "empty";
-
-        Drawable pluginIcon = defaultDrawable;
-
         try
         {
-          pluginIcon = pm.getApplicationIcon(packageInfo.packageName);
+          String author = (packageInfo.metaData != null) ? packageInfo.metaData.getString("plugin_author") : "empty";
+          Drawable pluginIcon = pm.getApplicationIcon(packageInfo.packageName);
+          plugins.add(new Plugin(String.valueOf(packageInfo.loadLabel(pm)), author, packageInfo.packageName, pluginIcon));
         }
         catch (PackageManager.NameNotFoundException e)
         {
           e.printStackTrace();
         }
-
-        plugins.add(new Plugin(String.valueOf(packageInfo.loadLabel(pm)), author, packageInfo.packageName, pluginIcon));
       }
     }
     return plugins;
