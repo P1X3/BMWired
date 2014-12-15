@@ -1,5 +1,7 @@
 package com.osovskiy.bmwired.fragment.setup;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -15,6 +17,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
+import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.osovskiy.bmwired.R;
 
 import java.util.ArrayList;
@@ -63,10 +66,28 @@ public class SetupFragment extends Fragment implements AdapterView.OnItemClickLi
   @Override
   public void onItemClick(AdapterView<?> parent, View view, int position, long id)
   {
-    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+    final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-    UsbSerialDriver selectedDriver = listDrivers.get(position);
-    preferences.edit().putString(getString(R.string.preference_serial_name_key), selectedDriver.getDevice().getDeviceName()).apply();
+    final UsbSerialDriver selectedDriver = listDrivers.get(position);
+
+    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
+    alertBuilder.setTitle("Select port");
+
+    ArrayList<String> portStrings = new ArrayList<>();
+    for (UsbSerialPort port : selectedDriver.getPorts())
+    {
+      portStrings.add(port.toString());
+    }
+    alertBuilder.setItems((String[])portStrings.toArray(), new DialogInterface.OnClickListener()
+    {
+      @Override
+      public void onClick(DialogInterface dialog, int which)
+      {
+        preferences.edit().putString(getString(R.string.preference_serial_name_key), selectedDriver.getDevice().getDeviceName()).
+            putString(getString(R.string.preference_serial_port_key), String.valueOf(which)).apply();
+      }
+    });
+    alertBuilder.show();
   }
 
   protected void updateUsbDrivers(List<UsbSerialDriver> usbDevices)
