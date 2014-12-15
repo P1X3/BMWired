@@ -2,7 +2,6 @@ package com.osovskiy.bmwired.fragment.plugins;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,14 +17,12 @@ public class PluginListAdapter extends ArrayAdapter<Plugin>
 {
   Context context;
   int resource;
-  List<Plugin> objects;
 
   public PluginListAdapter(Context context, int resource, List<Plugin> objects)
   {
     super(context, resource, objects);
     this.context = context;
     this.resource = resource;
-    this.objects = objects;
   }
 
   @Override
@@ -37,7 +34,7 @@ public class PluginListAdapter extends ArrayAdapter<Plugin>
       convertView = inflater.inflate(resource, parent, false);
     }
 
-    Plugin plugin = objects.get(position);
+    Plugin plugin = getItem(position);
 
     ( (TextView) convertView.findViewById(R.id.textPluginName) ).setText(plugin.getName());
     ( (TextView) convertView.findViewById(R.id.textPluginAuthor) ).setText(plugin.getAuthor());
