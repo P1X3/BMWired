@@ -35,9 +35,7 @@ class PluginLoader extends AsyncTask<Void, Void, List<Plugin>>
 
       if ( receiveGranted || sendGranted )
       {
-        String author = "empty";
-        if ( packageInfo.metaData != null )
-          author = packageInfo.metaData.getString("plugin_author");
+        String author = (packageInfo.metaData != null) ? packageInfo.metaData.getString("plugin_author") : "empty";
 
         Drawable pluginIcon = defaultDrawable;
 
