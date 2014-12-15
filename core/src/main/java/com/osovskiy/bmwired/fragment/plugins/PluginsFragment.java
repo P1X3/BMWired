@@ -10,7 +10,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -21,15 +20,8 @@ import java.util.List;
 
 public class PluginsFragment extends ListFragment
 {
-  private static final String TAG = PluginsFragment.class.getSimpleName();
-
   List<Plugin> pluginsList = new ArrayList<>();
   PluginListAdapter adapter;
-
-  public PluginsFragment()
-  {
-    Log.d(TAG, "constructor");
-  }
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
@@ -38,16 +30,14 @@ public class PluginsFragment extends ListFragment
   }
 
   @Override
-  public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+  public void onCreate(Bundle savedInstanceState)
   {
+    super.onCreate(savedInstanceState);
     setHasOptionsMenu(true);
-
     adapter = new PluginListAdapter(getActivity(), R.layout.list_plugin_item, pluginsList);
     setListAdapter(adapter);
 
     new PluginLoader(this).execute();
-
-    return super.onCreateView(inflater, container, savedInstanceState);
   }
 
   @Override
