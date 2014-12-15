@@ -28,13 +28,6 @@ class UsbDriverLoader extends AsyncTask<Void, Void, List<UsbSerialDriver>>
   @Override
   protected void onPostExecute(final List<UsbSerialDriver> drivers)
   {
-    setupFragment.getActivity().runOnUiThread(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        setupFragment.updateUsbDrivers(drivers);
-      }
-    });
+    setupFragment.updateUsbDrivers(drivers);
   }
 }

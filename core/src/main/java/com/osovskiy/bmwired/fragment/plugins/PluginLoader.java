@@ -57,13 +57,6 @@ class PluginLoader extends AsyncTask<Void, Void, List<Plugin>>
   @Override
   protected void onPostExecute(final List<Plugin> plugins)
   {
-    pluginsFragment.getActivity().runOnUiThread(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        pluginsFragment.updatePlugins(plugins);
-      }
-    });
+    pluginsFragment.updatePlugins(plugins);
   }
 }
