@@ -2,11 +2,13 @@ package com.osovskiy.bmwired;
 
 import android.content.Intent;
 import android.hardware.usb.UsbManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -49,14 +51,16 @@ public class MainActivity extends ActionBarActivity
     if ( action != null && action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED) )
     {
       Log.d(TAG, "USB_DEVICE_ATTACHED intent received");
-      Intent service = new Intent(getApplicationContext(), BMWiService.class);
-      service.setAction(BMWiService.EVENT_USB_DEVICE_ATTACHED);
+      Intent service = new Intent(BMWiService.EVENT_USB_DEVICE_ATTACHED, Uri.EMPTY, getApplicationContext(), BMWiService.class);
       startService(service);
       finish();
     }
 
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
 
     actionBar = getSupportActionBar();
 
