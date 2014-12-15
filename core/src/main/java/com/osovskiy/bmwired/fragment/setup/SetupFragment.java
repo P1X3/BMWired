@@ -52,7 +52,7 @@ public class SetupFragment extends Fragment implements AdapterView.OnItemClickLi
   {
     switch ( item.getItemId() )
     {
-      case R.id.actions_refresh:
+      case R.id.setup_refresh:
         new UsbDriverLoader(this).execute();
         return true;
       default:
