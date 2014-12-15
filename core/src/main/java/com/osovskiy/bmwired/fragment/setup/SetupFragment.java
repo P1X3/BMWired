@@ -1,11 +1,6 @@
 package com.osovskiy.bmwired.fragment.setup;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -16,12 +11,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
-import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.osovskiy.bmwired.R;
 
 import java.util.ArrayList;
@@ -43,7 +36,7 @@ public class SetupFragment extends Fragment implements AdapterView.OnItemClickLi
     lv.setAdapter(adapter);
     lv.setOnItemClickListener(this);
 
-    new LoadUSBDevices().execute();
+    new UsbDriverLoader(this).execute();
 
     return v;
   }
@@ -60,7 +53,7 @@ public class SetupFragment extends Fragment implements AdapterView.OnItemClickLi
     switch ( item.getItemId() )
     {
       case R.id.actions_refresh:
-        new LoadUSBDevices().execute();
+        new UsbDriverLoader(this).execute();
         return true;
       default:
         return super.onOptionsItemSelected(item);
@@ -76,60 +69,10 @@ public class SetupFragment extends Fragment implements AdapterView.OnItemClickLi
     preferences.edit().putString(getString(R.string.preference_serial_name_key), selectedDriver.getDevice().getDeviceName()).apply();
   }
 
-  private class LoadUSBDevices extends AsyncTask<Void, Void, Void>
+  protected void updateUsbDrivers(List<UsbSerialDriver> usbDevices)
   {
-
-    @Override
-    protected Void doInBackground(Void... params)
-    {
-      UsbManager manager = (UsbManager) getActivity().getSystemService(Context.USB_SERVICE);
-      listDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager);
-      return null;
-    }
-
-    @Override
-    protected void onPostExecute(Void aVoid)
-    {
-      getActivity().runOnUiThread(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          adapter.notifyDataSetChanged();
-        }
-      });
-    }
-  }
-
-  private class DriversListAdapter extends ArrayAdapter<UsbSerialDriver>
-  {
-    List<UsbSerialDriver> objects;
-    int resourceId;
-    Context context;
-
-    public DriversListAdapter(Context context, int resource, List<UsbSerialDriver> objects)
-    {
-      super(context, resource, objects);
-      this.resourceId = resource;
-      this.objects = objects;
-      this.context = context;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent)
-    {
-      if ( convertView == null )
-      {
-        LayoutInflater inflater = ( (Activity) context ).getLayoutInflater();
-        convertView = inflater.inflate(resourceId, parent, false);
-      }
-
-      UsbDevice driver = objects.get(position).getDevice();
-      ( (TextView) convertView.findViewById(R.id.textDriverName) ).setText(driver.getDeviceName());
-      ( (TextView) convertView.findViewById(R.id.textVendId) ).setText(driver.getVendorId());
-      ( (TextView) convertView.findViewById(R.id.textProdId) ).setText(driver.getProductId());
-
-      return convertView;
-    }
+    listDrivers = usbDevices;
+    adapter.notifyDataSetChanged();
+    Toast.makeText(getActivity(), listDrivers.size() + " devices found", Toast.LENGTH_SHORT).show();
   }
 }
