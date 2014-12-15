@@ -30,8 +30,9 @@ class PluginLoader extends AsyncTask<Void, Void, List<Plugin>>
     {
       boolean receiveGranted = (PackageManager.PERMISSION_GRANTED == pm.checkPermission(Utils.PERMISSION_RECEIVE_MESSAGE, packageInfo.packageName));
       boolean sendGranted = (PackageManager.PERMISSION_GRANTED == pm.checkPermission(Utils.PERMISSION_SEND_MESSAGE, packageInfo.packageName));
+      boolean aidlGranted = (PackageManager.PERMISSION_GRANTED == pm.checkPermission(Utils.PERMISSION_AIDL, packageInfo.packageName));
 
-      if ( receiveGranted || sendGranted )
+      if ( receiveGranted || sendGranted || aidlGranted)
       {
         try
         {

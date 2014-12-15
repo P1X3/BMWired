@@ -9,6 +9,9 @@
   <string name="label_permission_send">Send New BusMessage</string>
   <string name="desc_permission_send">Send new BusMessage broadcasts to the service.</string>
 
+  <string name="label_permission_aidl">AIDL Permission</string>
+  <string name="desc_permission_aidl">Allows the use of AIDL for persistent connections</string>
+
   <!-- Preferences -->
 
   <string name="preference_category_general">General</string>
