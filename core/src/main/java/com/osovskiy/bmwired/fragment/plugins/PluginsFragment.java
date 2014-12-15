@@ -63,7 +63,8 @@ public class PluginsFragment extends ListFragment
 
   protected void updatePlugins(List<Plugin> plugins)
   {
-    pluginsList = plugins;
+    adapter.clear();
+    adapter.addAll(plugins);
     adapter.notifyDataSetChanged();
     Toast.makeText(getActivity(), plugins.size() + " plugin(s) found", Toast.LENGTH_SHORT).show();
   }

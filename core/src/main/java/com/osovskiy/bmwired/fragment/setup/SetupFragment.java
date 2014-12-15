@@ -92,7 +92,8 @@ public class SetupFragment extends Fragment implements AdapterView.OnItemClickLi
 
   protected void updateUsbDrivers(List<UsbSerialDriver> usbDevices)
   {
-    listDrivers = usbDevices;
+    adapter.clear();
+    adapter.addAll(usbDevices);
     adapter.notifyDataSetChanged();
     Toast.makeText(getActivity(), listDrivers.size() + " devices found", Toast.LENGTH_SHORT).show();
   }
