@@ -5,7 +5,6 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 
-import com.osovskiy.bmwired.R;
 import com.osovskiy.bmwired.lib.Utils;
 
 import java.util.ArrayList;

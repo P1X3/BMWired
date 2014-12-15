@@ -6,7 +6,6 @@ import android.util.Log;
 import com.osovskiy.bmwired.bus.BusInterface;
 import com.osovskiy.bmwired.lib.BusMessage;
 
-import java.nio.ByteBuffer;
 import java.util.concurrent.BlockingQueue;
 
 public abstract class BusInterfaceWorker extends Thread
