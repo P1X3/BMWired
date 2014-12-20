@@ -1,21 +1,7 @@
-# Studio/Gradle
+.gradle
+/local.properties
+/gradle*
+/.idea
+/build
 *.iml
-.gradle/
-build/
-
-# Intellij IDEA (see https://intellij-support.jetbrains.com/entries/23393067)
-.idea/
-# generated files
-bin/
-gen/
-
-# Eclipse/Android/Misc
-.metadata/
-local.properties
-*.DS_Store
-proguard/
-
-# Extra
-usbSerialForAndroid/
-*.apk
-*.html
+/*/build
