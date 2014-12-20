@@ -98,10 +98,14 @@ public class MainActivity extends ActionBarActivity
     actionBar.setDisplayHomeAsUpEnabled(true);
     actionBar.setHomeButtonEnabled(true);
 
-    if (findViewById(R.id.fragment_container) != null)
-    {
-      getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SetupFragment()).commit();
-    }
+    loadFragment(0);
+  }
+
+  void loadFragment(int position)
+  {
+    listView.setItemChecked(position, true);
+    actionBar.setTitle(title = fragmentNames[position]);
+    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragments[position]).commit();
   }
 
   private class DrawerItemClickListener implements ListView.OnItemClickListener
@@ -110,11 +114,7 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
-      listView.setItemChecked(position, true);
-
-      actionBar.setTitle(title = fragmentNames[position]);
-
-      getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragments[position]).commit();
+      loadFragment(position);
       drawerLayout.closeDrawer(listView);
     }
   }
