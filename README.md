@@ -37,5 +37,13 @@ sendBroadcast(msg.getIntent(Utils.ACTION_SEND_BUS_MESSAGE), Utils.PERMISSION_SEN
 ```
 
 ## Building
-Add [usb-serial-for-android](https://github.com/mik3y/usb-serial-for-android) to project dependency list. Build. (maven coming soon)
 
+Clone [BMWired](https://github.com/P1X3/BMWired), [usb-serial-for-android](https://github.com/mik3y/usb-serial-for-android), and [android-support-v4-preferencefragment](https://github.com/kolavar/android-support-v4-preferencefragment) into same folder.
+
+```
+git clone https://github.com/P1X3/BMWired  
+git clone https://github.com/mik3y/usb-serial-for-android  
+git clone https://github.com/kolavar/android-support-v4-preferencefragment
+```
+
+Project is ready to be opened in Android Studio. Modules that project depends on will be automatically included assuming they were already cloned.
